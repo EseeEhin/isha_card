@@ -14,6 +14,7 @@ from werkzeug.utils import secure_filename
 from PIL import Image, ImageDraw, ImageFont
 import io
 import textwrap
+import math
 
 # 设置日志
 logging.basicConfig(level=logging.INFO)
@@ -184,11 +185,12 @@ def create_fortune_image(fortune_data: dict):
             if "star" in star_shape:
                 # Draw a 5-pointed star
                 points = []
-                for j in range(5):
-                    angle = j * 4 * 3.14159 / 5
-                    r = star_size // 2 if j % 2 == 0 else star_size // 4
-                    points.append((x_pos + r * -_sin(angle), y_pos + r * -_cos(angle)))
-                draw.polygon(points, fill=fill_color, outline=outline_color, width=2)
+                for k in range(10):
+                    angle_deg = -90 + k * 36  # Start from top
+                    angle_rad = math.radians(angle_deg)
+                    r = star_size / 2 if k % 2 == 0 else star_size / 4
+                    points.append((x_pos + r * math.cos(angle_rad), y_pos + r * math.sin(angle_rad)))
+                draw.polygon(points, fill=fill_color, outline=outline_color)
             elif "heart" in star_shape:
                 # Draw a heart
                 draw.ellipse((x_pos - star_size//4, y_pos - star_size//4, x_pos + star_size//4, y_pos + star_size//4), fill=fill_color, outline=outline_color, width=2)
@@ -231,15 +233,6 @@ def create_fortune_image(fortune_data: dict):
     
     return img_byte_arr
 
-# Helper functions for drawing shapes, to avoid new imports in global scope
-def _sin(degrees):
-    import math
-    return math.sin(math.radians(degrees))
-
-def _cos(degrees):
-    import math
-    return math.cos(math.radians(degrees))
-
 # /fortune 指令
 @bot.tree.command(name="运势", description="抽一张今日运势牌")
 async def fortune(interaction: discord.Interaction):
@@ -266,6 +259,91 @@ async def fortune(interaction: discord.Interaction):
     except Exception as e:
         logger.error(f"Error in fortune command: {e}")
         await interaction.followup.send("抱歉，出现了一些问题，请稍后再试。", ephemeral=True)
+
+# --- 调试指令 ---
+
+@bot.tree.command(name="debug_fortune", description="[仅管理员] 抽取指定的运势牌")
+@app_commands.rename(fortune_id="运势id")
+@app_commands.describe(fortune_id="请选择要抽取的运势牌")
+@app_commands.checks.has_permissions(administrator=True)
+async def debug_fortune(interaction: discord.Interaction, fortune_id: int):
+    try:
+        await interaction.response.defer(ephemeral=True)
+
+        fortunes = bot.load_data(bot.fortune_file)
+        chosen_fortune = next((f for f in fortunes if f['id'] == fortune_id), None)
+
+        if not chosen_fortune:
+            await interaction.followup.send(f"未找到ID为 {fortune_id} 的运势。", ephemeral=True)
+            return
+
+        image_file_bytes = create_fortune_image(chosen_fortune)
+        picture = discord.File(fp=image_file_bytes, filename=f"fortune_{fortune_id}.png")
+        await interaction.followup.send(f"调试抽取运势: **{chosen_fortune['level']}**", file=picture, ephemeral=True)
+
+    except Exception as e:
+        logger.error(f"Error in debug_fortune command: {e}")
+        await interaction.followup.send("生成调试运势图时出错。", ephemeral=True)
+
+@debug_fortune.autocomplete('fortune_id')
+async def debug_fortune_autocomplete(interaction: discord.Interaction, current: str) -> list[app_commands.Choice[int]]:
+    fortunes = bot.load_data(bot.fortune_file)
+    choices = [
+        app_commands.Choice(name=f"({item['stars']}★) {item['level']}", value=item['id'])
+        for item in fortunes if current.lower() in item['level'].lower() or str(item['id']) == current
+    ]
+    return choices[:25]
+
+@bot.tree.command(name="debug_tarot", description="[仅管理员] 抽取指定的塔罗牌")
+@app_commands.rename(card_id="塔罗牌id", orientation="正逆位")
+@app_commands.describe(card_id="请选择要抽取的塔罗牌", orientation="选择正位或逆位")
+@app_commands.choices(orientation=[
+    app_commands.Choice(name="正位", value="upright"),
+    app_commands.Choice(name="逆位", value="reversed")
+])
+@app_commands.checks.has_permissions(administrator=True)
+async def debug_tarot(interaction: discord.Interaction, card_id: int, orientation: str):
+    try:
+        await interaction.response.defer(ephemeral=True)
+        tarot_cards = bot.load_data(bot.tarot_file)
+        chosen_card = next((c for c in tarot_cards if c['id'] == card_id), None)
+
+        if not chosen_card:
+            await interaction.followup.send(f"未找到ID为 {card_id} 的塔罗牌。", ephemeral=True)
+            return
+
+        orientation_text = "正位" if orientation == 'upright' else "逆位"
+        description = chosen_card['description'][orientation]
+        card_name_with_orientation = f"{chosen_card['name']} ({orientation_text})"
+
+        embed = discord.Embed(
+            title=f"调试抽取... {card_name_with_orientation}",
+            description=f"**牌面解读:**\n{description}",
+            color=discord.Color.blue()
+        )
+        
+        image_url = chosen_card.get("image")
+        if image_url:
+            if not image_url.startswith('http'):
+                 base_url = os.getenv("BASE_URL", "http://localhost:7860")
+                 image_url = f"{base_url}/{image_url}"
+            embed.set_image(url=image_url)
+            
+        await interaction.followup.send(embed=embed, ephemeral=True)
+
+    except Exception as e:
+        logger.error(f"Error in debug_tarot command: {e}")
+        await interaction.followup.send("生成调试塔罗牌时出错。", ephemeral=True)
+
+@debug_tarot.autocomplete('card_id')
+async def debug_tarot_autocomplete(interaction: discord.Interaction, current: str) -> list[app_commands.Choice[int]]:
+    tarot_cards = bot.load_data(bot.tarot_file)
+    choices = [
+        app_commands.Choice(name=card['name'], value=card['id'])
+        for card in tarot_cards if current.lower() in card['name'].lower() or str(card['id']) == current
+    ]
+    return choices[:25]
+
 
 # /tarot 指令
 @bot.tree.command(name="塔罗", description="抽一张塔罗牌")
