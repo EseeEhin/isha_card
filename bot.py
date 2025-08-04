@@ -198,6 +198,15 @@ async def fortune(interaction: discord.Interaction):
             
         embed.add_field(name="血族猫娘的低语", value=final_text, inline=False)
         
+        # 设置图片
+        image_url = chosen_level.get("image")
+        if image_url:
+            # 如果是本地路径，需要转换为可访问的URL
+            if not image_url.startswith('http'):
+                 base_url = os.getenv("BASE_URL", "http://localhost:7860")
+                 image_url = f"{base_url}/{image_url}"
+            embed.set_image(url=image_url)
+
         embed.set_footer(text=f"来自暗影与月光下的祝福 | {bot.user.name}")
         
         await interaction.response.send_message(embed=embed)
@@ -284,30 +293,30 @@ async def tarot_card_autocomplete(interaction: discord.Interaction, current: str
     ]
     return choices[:25]
 
-@bot.tree.command(name="更新运势图片", description="更新指定运势的图片")
-@app_commands.rename(fortune_id="运势", url="链接")
-@app_commands.describe(fortune_id="请选择要更新的运势", url="新的图片URL")
-async def update_fortune_image(interaction: discord.Interaction, fortune_id: int, url: str):
+@bot.tree.command(name="更新运势图片", description="更新指定运势等级的背景图片")
+@app_commands.rename(level_id="运势等级", url="链接")
+@app_commands.describe(level_id="请选择要更新的运势等级", url="新的图片URL")
+async def update_fortune_image(interaction: discord.Interaction, level_id: int, url: str):
     if not interaction.user.guild_permissions.administrator:
         await interaction.response.send_message("抱歉，只有服务器管理员才能使用此命令。", ephemeral=True)
         return
 
     try:
-        fortunes = bot.load_data(bot.fortune_file)
-        fortune_to_update = next((f for f in fortunes if f['id'] == fortune_id), None)
+        fortune_data = bot.load_data(bot.fortune_file)
+        level_to_update = next((l for l in fortune_data['levels'] if l['id'] == level_id), None)
 
-        if not fortune_to_update:
-            await interaction.response.send_message(f"未找到ID为 {fortune_id} 的运势。", ephemeral=True)
+        if not level_to_update:
+            await interaction.response.send_message(f"未找到ID为 {level_id} 的运势等级。", ephemeral=True)
             return
 
-        old_url = fortune_to_update.get("image", "")
-        fortune_to_update["image"] = url
-        bot.save_data(bot.fortune_file, fortunes)
+        old_url = level_to_update.get("image", "")
+        level_to_update["image"] = url
+        bot.save_data(bot.fortune_file, fortune_data)
 
-        log_message = f"User '{interaction.user}' (ID: {interaction.user.id}) updated image for Fortune (ID: {fortune_id}, Name: {fortune_to_update['level']}): from '{old_url}' to '{url}'"
+        log_message = f"User '{interaction.user}' (ID: {interaction.user.id}) updated image for Fortune Level (ID: {level_id}, Name: {level_to_update['level_name']}): from '{old_url}' to '{url}'"
         op_logger.info(log_message)
 
-        embed = discord.Embed(title="🖼️ 运势图片更新成功", description=f"已成功更新 **{fortune_to_update['level']}** 的图片。", color=discord.Color.green())
+        embed = discord.Embed(title="🖼️ 运势图片更新成功", description=f"已成功更新 **{level_to_update['level_name']}** 的图片。", color=discord.Color.green())
         if url:
             embed.set_image(url=url)
         await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -315,12 +324,12 @@ async def update_fortune_image(interaction: discord.Interaction, fortune_id: int
         logger.error(f"Error in update_fortune_image command: {e}")
         await interaction.response.send_message("更新过程中出现错误，请检查日志。", ephemeral=True)
 
-@update_fortune_image.autocomplete('fortune_id')
-async def fortune_autocomplete(interaction: discord.Interaction, current: str) -> list[app_commands.Choice[int]]:
-    fortunes = bot.load_data(bot.fortune_file)
+@update_fortune_image.autocomplete('level_id')
+async def fortune_level_autocomplete(interaction: discord.Interaction, current: str) -> list[app_commands.Choice[int]]:
+    fortune_data = bot.load_data(bot.fortune_file)
     choices = [
-        app_commands.Choice(name=f"({item['stars']}★) {item['level']}", value=item['id'])
-        for item in fortunes if current.lower() in item['level'].lower()
+        app_commands.Choice(name=f"({level['stars']}★) {level['level_name']}", value=level['id'])
+        for level in fortune_data.get('levels', []) if current.lower() in level['level_name'].lower()
     ]
     return choices[:25]
 
@@ -404,6 +413,7 @@ def fortune_web():
                     level['level_name'] = request.form.get(f'level_name_{level_id}', level['level_name'])
                     level['stars'] = int(request.form.get(f'stars_{level_id}', level['stars']))
                     level['star_shape'] = request.form.get(f'star_shape_{level_id}', level['star_shape'])
+                    level['image'] = request.form.get(f'image_{level_id}', '')
 
             bot.save_data(bot.fortune_file, fortune_data)
             return redirect(url_for('fortune_web'))

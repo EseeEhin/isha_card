@@ -4,28 +4,37 @@
       { "id": 1, "tag": "天降横财", "text": "你的财运爆棚，钱包鼓鼓囊囊，" },
       { "id": 2, "tag": "桃花朵朵", "text": "浪漫的邂逅即将发生，" },
       { "id": 3, "tag": "事业高升", "text": "工作上的努力将得到回报，" },
-      { "id": 4, "tag": "贵人相助", "text": "会有人在关键时刻帮你一把，" }
+      { "id": 4, "tag": "贵人相助", "text": "会有人在关键时刻帮你一把，" },
+      { "id": 5, "tag": "灵感爆发", "text": "创造力如泉涌，" },
+      { "id": 6, "tag": "心想事成", "text": "你心里想的事情会顺利实现，" },
+      { "id": 7, "tag": "学业有成", "text": "今天的学习效率特别高，" }
     ],
     "bad": [
       { "id": 1, "tag": "小人作祟", "text": "注意身边可能会有不和谐的声音，" },
       { "id": 2, "tag": "破财消灾", "text": "可能会有意外的支出，" },
-      { "id": 3, "tag": "诸事不顺", "text": "今天做事可能会遇到一些阻碍，" }
+      { "id": 3, "tag": "诸事不顺", "text": "今天做事可能会遇到一些阻碍，" },
+      { "id": 4, "tag": "水逆退散", "text": "感觉有点混乱，最好检查一下日程安排，" },
+      { "id": 5, "tag": "心烦意乱", "text": "内心有些焦躁不安，" },
+      { "id": 6, "tag": "无妄之灾", "text": "可能会被卷入意想不到的麻烦里，" }
     ],
     "neutral": [
       { "id": 1, "tag": "平淡是福", "text": "今天会是平静祥和的一天。" },
       { "id": 2, "tag": "保持健康", "text": "记得多喝水多运动。" },
       { "id": 3, "tag": "宜室宜家", "text": "适合待在家里享受宁静时光。" },
-      { "id": 4, "tag": "静心思考", "text": "适合一个人静静地思考人生。" }
+      { "id": 4, "tag": "静心思考", "text": "适合一个人静静地思考人生。" },
+      { "id": 5, "tag": "出门走走", "text": "可以出门散散心，呼吸新鲜空气。" },
+      { "id": 6, "tag": "人际和谐", "text": "与他人的交往会很顺利。" },
+      { "id": 7, "tag": "按部就班", "text": "按照计划行事就好。" }
     ]
   },
   "levels": [
-    { "id": 1, "level_name": "大吉", "stars": 7, "star_shape": "star" },
-    { "id": 2, "level_name": "中吉", "stars": 6, "star_shape": "star" },
-    { "id": 3, "level_name": "吉", "stars": 5, "star_shape": "star" },
-    { "id": 4, "level_name": "小吉", "stars": 4, "star_shape": "star" },
-    { "id": 5, "level_name": "末吉", "stars": 3, "star_shape": "thorn" },
-    { "id": 6, "level_name": "小厄", "stars": 2, "star_shape": "thorn" },
-    { "id": 7, "level_name": "大厄", "stars": 1, "star_shape": "skull" }
+    { "id": 1, "level_name": "大吉", "stars": 7, "star_shape": "star", "image": "" },
+    { "id": 2, "level_name": "中吉", "stars": 6, "star_shape": "star", "image": "" },
+    { "id": 3, "level_name": "吉", "stars": 5, "star_shape": "star", "image": "" },
+    { "id": 4, "level_name": "小吉", "stars": 4, "star_shape": "star", "image": "" },
+    { "id": 5, "level_name": "末吉", "stars": 3, "star_shape": "thorn", "image": "" },
+    { "id": 6, "level_name": "小厄", "stars": 2, "star_shape": "thorn", "image": "" },
+    { "id": 7, "level_name": "大厄", "stars": 1, "star_shape": "skull", "image": "" }
   ],
   "connectors": {
     "intro": "血族猫娘悄悄告诉你：",

@@ -91,7 +91,7 @@
                 <form action="{{ url_for('fortune_web') }}" method="post">
                     <input type="hidden" name="form_type" value="levels">
                     <table class="table table-sm">
-                        <thead><tr><th>ID</th><th>等级名称</th><th>星星数 (1-7)</th><th>星星形状</th></tr></thead>
+                        <thead><tr><th>ID</th><th>等级名称</th><th>星星数</th><th>星星形状</th><th>图片链接</th><th>预览</th></tr></thead>
                         <tbody>
                         {% for level in fortune_data.levels %}
                             <tr>
@@ -106,6 +106,14 @@
                                         <option value="thorn" {% if level.star_shape == 'thorn' %}selected{% endif %}>荆棘 🥀</option>
                                         <option value="skull" {% if level.star_shape == 'skull' %}selected{% endif %}>骷髅 💀</option>
                                     </select>
+                                </td>
+                                <td><input type="text" class="form-control form-control-sm" name="image_{{ level.id }}" value="{{ level.image or '' }}" placeholder="输入图片URL"></td>
+                                <td>
+                                    {% if level.image %}
+                                    <img src="{{ level.image if level.image.startswith('http') else url_for('static', filename=level.image.split('static/')[1]) }}" style="max-width: 100px; max-height: 50px; object-fit: cover;" alt="预览">
+                                    {% else %}
+                                    <span class="text-muted">无图</span>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% endfor %}
