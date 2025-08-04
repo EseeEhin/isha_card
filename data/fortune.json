@@ -1,47 +1,54 @@
-[
-  {
-    "id": 1,
-    "level": "辉耀大吉",
-    "tags": ["姻缘", "邂逅", "魅力"],
-    "stars": 7,
-    "star_shape": "heart",
-    "description": "喵~今天你的魅力无人能挡，就像黑夜里最亮的星辰。空气中弥漫着甜美的血腥味……啊不，是爱情的芬芳。敞开心扉，迎接一场浪漫的邂逅吧，我的小猎物。",
-    "image": "static/uploads/fortune_bg_good.jpg"
+{
+  "tag_pools": {
+    "good": [
+      "天降横财", "桃花朵朵", "事业高升", "灵感爆发", "贵人相助", "心想事成"
+    ],
+    "bad": [
+      "无妄之灾", "水逆退散", "小人作祟", "破财消灾", "诸事不顺", "心烦意乱"
+    ],
+    "neutral": [
+      "平淡是福", "静心思考", "人际和谐", "保持健康", "出门走走", "宜室宜家"
+    ]
   },
-  {
-    "id": 2,
-    "level": "幸运高照",
-    "tags": ["事业", "机遇", "财富"],
-    "stars": 6,
-    "star_shape": "coin",
-    "description": "哼哼，闻到金钱的味道了吗？今天的你就像抓到了最肥美的老鼠，财运亨通。保持敏锐的直觉，抓住那个一闪而过的机会，宝藏就在眼前了哦。",
-    "image": "static/uploads/fortune_bg_good.jpg"
-  },
-  {
-    "id": 3,
-    "level": "平和之日",
-    "tags": ["日常", "安稳", "小憩"],
-    "stars": 4,
-    "star_shape": "star",
-    "description": "今天就像一个慵懒的午后，最适合找个舒服的角落打个盹。没什么大事发生，就让紧绷的神经放松一下吧。偶尔的平静，是为了下一次更好的狩猎，你懂的。",
-    "image": "static/uploads/fortune_bg_normal.jpg"
-  },
-  {
-    "id": 4,
-    "level": "微光厄运",
-    "tags": ["波折", "挑战", "谨慎"],
-    "stars": 2,
-    "star_shape": "thorn",
-    "description": "喵呜…今天的路有点不平坦呢，像是有讨厌的荆棘挡路。不过别担心，只是一些小麻烦。收起你的爪子，小心翼翼地绕过去就好，可别被扎到了。",
-    "image": "static/uploads/fortune_bg_bad.jpg"
-  },
-  {
-    "id": 5,
-    "level": "暗影笼罩",
-    "tags": ["失落", "阻碍", "蛰伏"],
-    "stars": 1,
-    "star_shape": "skull",
-    "description": "嘘…今天不适合外出捕猎。空气中充满了危险的气息，最好躲在自己的城堡里。记住，暂时的蛰伏不是软弱，是为了在下一个月圆之夜，展现更强大的力量。",
-    "image": "static/uploads/fortune_bg_bad.jpg"
-  }
-]
+  "levels": [
+    { "id": 1, "level_name": "大吉", "stars": 7, "star_shape": "star" },
+    { "id": 2, "level_name": "中吉", "stars": 6, "star_shape": "star" },
+    { "id": 3, "level_name": "吉", "stars": 5, "star_shape": "star" },
+    { "id": 4, "level_name": "小吉", "stars": 4, "star_shape": "star" },
+    { "id": 5, "level_name": "末吉", "stars": 3, "star_shape": "thorn" },
+    { "id": 6, "level_name": "小厄", "stars": 2, "star_shape": "thorn" },
+    { "id": 7, "level_name": "大厄", "stars": 1, "star_shape": "skull" }
+  ],
+  "descriptions": [
+    {
+      "id": 1,
+      "tags": ["天降横财", "桃花朵朵"],
+      "text": "血族猫娘舔了舔爪子：喵~ 今天你不仅钱包鼓鼓，还能转角遇到爱哦！真是让人嫉妒的好运！"
+    },
+    {
+      "id": 2,
+      "tags": ["事业高升"],
+      "text": "血族猫娘严肃地看着你：今天在工作上要像捕猎的猫一样专注，主动出击，会有意想不到的收获！"
+    },
+    {
+      "id": 3,
+      "tags": ["水逆退散", "平淡是福"],
+      "text": "血族猫娘提醒你：今天可能会有些小麻烦，但保持平常心就能安然度过，喵。"
+    },
+    {
+      "id": 4,
+      "tags": ["小人作祟"],
+      "text": "血族猫娘的胡须抽动了一下：似乎有不怀好意的家伙在附近。今天说话要小心，别被抓到把柄了。"
+    },
+    {
+      "id": 5,
+      "tags": ["静心思考"],
+      "text": "血族猫娘趴在你身边，安靜地打着呼噜。今天适合一个人静静地待着，思考一些重要的事情。"
+    },
+    {
+      "id": 6,
+      "tags": ["贵人相助", "人际和谐"],
+      "text": "血族猫娘蹭了蹭你的腿：今天会遇到帮助你的人哦，对身边的人友善一点吧，会有好报的。"
+    }
+  ]
+}

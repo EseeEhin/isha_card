@@ -107,23 +107,79 @@ async def on_error(event, *args, **kwargs):
 @bot.tree.command(name="运势", description="抽一张今日运势牌")
 async def fortune(interaction: discord.Interaction):
     try:
-        fortunes = bot.load_data(bot.fortune_file)
-        if not fortunes:
-            await interaction.response.send_message("抱歉，运势数据正在维护中，请稍后再试。")
+        fortune_data = bot.load_data(bot.fortune_file)
+        if not all(k in fortune_data for k in ["levels", "descriptions", "tag_pools"]):
+            await interaction.response.send_message("抱歉，运势数据结构不正确，请检查 `fortune.json`。")
             return
 
-        chosen_fortune = random.choice(fortunes)
+        # 1. 随机选择一个运势等级
+        chosen_level = random.choice(fortune_data["levels"])
+        stars = chosen_level.get("stars", 3)
+
+        # 2. 根据星级决定可用的标签池
+        tag_pools = fortune_data.get("tag_pools", {})
+        good_pool = tag_pools.get("good", [])
+        bad_pool = tag_pools.get("bad", [])
+        neutral_pool = tag_pools.get("neutral", [])
         
-        if "吉" in chosen_fortune["level"] or "高照" in chosen_fortune["level"]:
+        available_tags = []
+        if stars > 5: # 好运
+            available_tags = good_pool + neutral_pool
+        elif stars <= 2: # 厄运
+            available_tags = bad_pool + neutral_pool
+        else: # 中性运
+            available_tags = neutral_pool
+        
+        # 3. 准备描述数据以便快速查找
+        description_map = {
+            tuple(sorted(desc["tags"])): desc["text"] 
+            for desc in fortune_data["descriptions"]
+        }
+
+        # 4. 从可用标签池中随机抽取标签组合，并确保该组合有对应的描述
+        selected_tags = []
+        final_description = ""
+        
+        if available_tags:
+            # 安全循环，尝试最多10次找到一个有效的标签组合
+            for _ in range(10):
+                max_tags_to_pick = min(2, len(available_tags))
+                if max_tags_to_pick < 1: break
+                num_to_pick = random.randint(1, max_tags_to_pick)
+                
+                sampled_tags = random.sample(available_tags, num_to_pick)
+                tag_key = tuple(sorted(sampled_tags))
+                
+                if tag_key in description_map:
+                    selected_tags = sampled_tags
+                    final_description = description_map[tag_key]
+                    break
+            
+            # 如果循环10次都没找到，则降级为只抽一个标签再试一次
+            if not final_description:
+                for tag in random.sample(available_tags, k=len(available_tags)):
+                    tag_key = tuple(sorted([tag]))
+                    if tag_key in description_map:
+                        selected_tags = [tag]
+                        final_description = description_map[tag_key]
+                        break
+        
+        # 如果还是没有，给一个默认的最终保底描述
+        if not final_description:
+            final_description = "血族猫娘今天有点累，她只是静静地看着你，什么也没说。"
+
+        # 5. 构建 Embed
+        level_name = chosen_level["level_name"]
+        if stars > 4: # 吉
             color = discord.Color.gold()
-        elif "厄" in chosen_fortune["level"] or "笼罩" in chosen_fortune["level"]:
+        elif stars <= 2: # 厄
             color = discord.Color.dark_purple()
-        else:
+        else: # 中
             color = discord.Color.light_grey()
 
         star_icons = {'heart': '❤️', 'coin': '💰', 'star': '✨', 'thorn': '🥀', 'skull': '💀'}
-        star_symbol = star_icons.get(chosen_fortune.get("star_shape", "star"), '✨')
-        stars_display = star_symbol * chosen_fortune["stars"] + '🖤' * (7 - chosen_fortune["stars"])
+        star_symbol = star_icons.get(chosen_level.get("star_shape", "star"), '✨')
+        stars_display = star_symbol * stars + '🖤' * (7 - stars)
 
         embed = discord.Embed(
             title=f"血族猫娘的今日占卜",
@@ -131,24 +187,14 @@ async def fortune(interaction: discord.Interaction):
             color=color
         )
         
-        embed.add_field(name="今日运势", value=f"**{chosen_fortune['level']}**", inline=False)
+        embed.add_field(name="今日运势", value=f"**{level_name}**", inline=False)
         embed.add_field(name="幸运星", value=stars_display, inline=False)
         
-        if chosen_fortune.get("tags"):
-            tags = " | ".join([f"`{tag}`" for tag in chosen_fortune["tags"]])
-            embed.add_field(name="运势标签", value=tags, inline=False)
+        if selected_tags:
+            tags_display = " | ".join([f"`{tag}`" for tag in selected_tags])
+            embed.add_field(name="运势标签", value=tags_display, inline=False)
             
-        embed.add_field(name="血族猫娘的低语", value=chosen_fortune["description"], inline=False)
-        
-        image_path = chosen_fortune.get("image")
-        if image_path:
-            if image_path.startswith('http'):
-                image_url = image_path
-            elif os.path.exists(image_path):
-                image_filename = os.path.basename(image_path)
-                base_url = os.getenv("BASE_URL", "http://localhost:7860") 
-                image_url = f"{base_url}/{image_path}"
-                embed.set_image(url=image_url)
+        embed.add_field(name="血族猫娘的低语", value=final_description, inline=False)
         
         embed.set_footer(text=f"来自暗影与月光下的祝福 | {bot.user.name}")
         
@@ -318,42 +364,50 @@ def tarot_web():
 @app.route('/fortune', methods=['GET', 'POST'])
 def fortune_web():
     try:
-        fortunes = bot.load_data(bot.fortune_file)
+        fortune_data = bot.load_data(bot.fortune_file)
         if request.method == 'POST':
-            updated_fortunes = []
-            for i in range(len(fortunes)):
-                item_id = int(request.form.get(f'id_{i}'))
-                item = next((f for f in fortunes if f['id'] == item_id), None)
-                if not item:
-                    continue
+            form_type = request.form.get('form_type')
 
-                item['level'] = request.form.get(f'level_{item_id}', item['level'])
-                tags_str = request.form.get(f'tags_{item_id}', '')
-                item['tags'] = [tag.strip() for tag in tags_str.split(',') if tag.strip()]
-                item['stars'] = int(request.form.get(f'stars_{item_id}', item['stars']))
-                item['star_shape'] = request.form.get(f'star_shape_{item_id}', item['star_shape'])
-                item['description'] = request.form.get(f'description_{item_id}', item['description'])
+            if form_type == 'tag_pools':
+                fortune_data['tag_pools']['good'] = [tag.strip() for tag in request.form.get('good_tags', '').split(',') if tag.strip()]
+                fortune_data['tag_pools']['neutral'] = [tag.strip() for tag in request.form.get('neutral_tags', '').split(',') if tag.strip()]
+                fortune_data['tag_pools']['bad'] = [tag.strip() for tag in request.form.get('bad_tags', '').split(',') if tag.strip()]
 
-                file_key = f'image_upload_{item_id}'
-                if file_key in request.files:
-                    file = request.files[file_key]
-                    if file and file.filename and allowed_file(file.filename):
-                        filename = secure_filename(f"fortune_bg_{item_id}{os.path.splitext(file.filename)[1]}")
-                        save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                        file.save(save_path)
-                        item['image'] = os.path.join(UPLOAD_FOLDER, filename).replace(os.path.sep, '/')
-                
-                updated_fortunes.append(item)
+            elif form_type == 'levels':
+                for level in fortune_data['levels']:
+                    level_id = level['id']
+                    level['level_name'] = request.form.get(f'level_name_{level_id}', level['level_name'])
+                    level['stars'] = int(request.form.get(f'stars_{level_id}', level['stars']))
+                    level['star_shape'] = request.form.get(f'star_shape_{level_id}', level['star_shape'])
 
-            existing_ids = {f['id'] for f in updated_fortunes}
-            for f in fortunes:
-                if f['id'] not in existing_ids:
-                    updated_fortunes.append(f)
+            elif form_type == 'descriptions':
+                if 'delete_desc' in request.form:
+                    desc_id_to_delete = int(request.form.get('delete_desc'))
+                    fortune_data['descriptions'] = [d for d in fortune_data['descriptions'] if d['id'] != desc_id_to_delete]
+                else:
+                    for desc in fortune_data['descriptions']:
+                        desc_id = desc['id']
+                        tags_str = request.form.get(f'tags_{desc_id}', '')
+                        desc['tags'] = [tag.strip() for tag in tags_str.split(',') if tag.strip()]
+                        desc['text'] = request.form.get(f'text_{desc_id}', desc['text'])
+            
+            elif form_type == 'add_description':
+                new_tags_str = request.form.get('new_tags', '')
+                new_text = request.form.get('new_text', '')
+                if new_tags_str and new_text:
+                    new_tags = [tag.strip() for tag in new_tags_str.split(',') if tag.strip()]
+                    max_id = max(d['id'] for d in fortune_data['descriptions']) if fortune_data['descriptions'] else 0
+                    new_desc = {
+                        "id": max_id + 1,
+                        "tags": new_tags,
+                        "text": new_text
+                    }
+                    fortune_data['descriptions'].append(new_desc)
 
-            bot.save_data(bot.fortune_file, updated_fortunes)
+            bot.save_data(bot.fortune_file, fortune_data)
             return redirect(url_for('fortune_web'))
             
-        return render_template('fortune.html', fortunes=fortunes)
+        return render_template('fortune.html', fortune_data=fortune_data)
     except Exception as e:
         logger.error(f"Error in fortune_web: {e}")
         return "Error loading fortune data", 500

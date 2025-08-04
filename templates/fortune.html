@@ -3,215 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理运势 - 血族猫娘占卜屋</title>
+    <title>管理运势</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #1a1a2e;
-            color: #e0e0e0;
-        }
-        .container {
-            background: #162447;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
-            border: 1px solid #1f4068;
-        }
-        h1 {
-            color: #e43f5a;
-            text-align: center;
-            margin-bottom: 30px;
-            font-family: 'Georgia', serif;
-            text-shadow: 0 0 10px #e43f5a;
-        }
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            padding: 10px 20px;
-            background: #e43f5a;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background 0.3s, transform 0.2s;
-        }
-        .back-link:hover {
-            background: #b83248;
-            transform: translateY(-2px);
-        }
-        .fortune-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-            margin-top: 20px;
-        }
-        .fortune-item {
-            border: 2px solid #1f4068;
-            border-radius: 10px;
-            padding: 20px;
-            background: #1b1b2f;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        .fortune-item:hover {
-            border-color: #e43f5a;
-            box-shadow: 0 0 15px rgba(228, 63, 90, 0.5);
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #a0a0e0;
-        }
-        input[type="text"], input[type="number"], textarea, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #1f4068;
-            border-radius: 5px;
-            font-family: inherit;
-            background-color: #162447;
-            color: #e0e0e0;
-            box-sizing: border-box;
-        }
-        textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: #e43f5a;
-            box-shadow: 0 0 8px rgba(228, 63, 90, 0.4);
-        }
-        .image-preview-container {
-            margin-top: 10px;
-            text-align: center;
-        }
-        .image-preview {
-            max-width: 150px;
-            max-height: 150px;
-            border: 1px solid #1f4068;
-            border-radius: 8px;
-            background-color: #1a1a2e;
-            object-fit: contain;
-            display: none;
-        }
-        .image-preview.visible {
-            display: inline-block;
-        }
-        .save-btn {
-            background: linear-gradient(135deg, #e43f5a 0%, #b83248 100%);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.3s;
-            margin-top: 20px;
-            text-shadow: 0 0 5px rgba(0,0,0,0.5);
-        }
-        .save-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(228, 63, 90, 0.4);
-        }
-        .save-container {
-            text-align: center;
-            margin-top: 40px;
-        }
+        body { background-color: #f8f9fa; }
+        .container { max-width: 1200px; }
+        .card-header { font-weight: bold; }
+        .tag-input { background-color: #e9ecef; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🌙 管理运势</h1>
-        <a href="{{ url_for('index') }}" class="back-link">← 返回主页</a>
-        
-        <form method="post" enctype="multipart/form-data">
-            <div class="fortune-container">
-                {% for item in fortunes %}
-                <div class="fortune-item">
-                    <input type="hidden" name="id_{{ loop.index0 }}" value="{{ item.id }}">
-                    
-                    <div class="form-group">
-                        <label for="level_{{ item.id }}">运势等级:</label>
-                        <input type="text" name="level_{{ item.id }}" id="level_{{ item.id }}" value="{{ item.level }}">
-                    </div>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">管理运势</h1>
+        <div class="alert alert-info">
+            <strong>说明:</strong> 在这里管理运势的标签池、基础等级和描述组合。修改后会自动保存。
+        </div>
 
-                    <div class="form-group">
-                        <label for="tags_{{ item.id }}">运势标签 (用逗号分隔):</label>
-                        <input type="text" name="tags_{{ item.id }}" id="tags_{{ item.id }}" value="{{ item.tags | join(', ') }}">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="stars_{{ item.id }}">星星数量 (1-7):</label>
-                        <input type="number" name="stars_{{ item.id }}" id="stars_{{ item.id }}" value="{{ item.stars }}" min="1" max="7">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="star_shape_{{ item.id }}">星星形状:</label>
-                        <select name="star_shape_{{ item.id }}" id="star_shape_{{ item.id }}">
-                            <option value="star" {% if item.star_shape == 'star' %}selected{% endif %}>普通 ✨</option>
-                            <option value="heart" {% if item.star_shape == 'heart' %}selected{% endif %}>爱心 ❤️</option>
-                            <option value="coin" {% if item.star_shape == 'coin' %}selected{% endif %}>金币 💰</option>
-                            <option value="thorn" {% if item.star_shape == 'thorn' %}selected{% endif %}>荆棘 🥀</option>
-                            <option value="skull" {% if item.star_shape == 'skull' %}selected{% endif %}>骷髅 💀</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="description_{{ item.id }}">运势解读:</label>
-                        <textarea name="description_{{ item.id }}" id="description_{{ item.id }}">{{ item.description }}</textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="image_upload_{{ item.id }}">上传新背景图片 (会覆盖旧图片):</label>
-                        <input type="file" name="image_upload_{{ item.id }}" id="image_upload_{{ item.id }}" accept="image/*" onchange="updatePreview('{{ item.id }}')">
-                        <div class="image-preview-container">
-                            <img id="preview_{{ item.id }}" src="{{ item.image if item.image else '' }}" class="image-preview {{ 'visible' if item.image else '' }}" alt="图片预览">
+        <!-- 管理标签池 -->
+        <div class="card mb-5">
+            <div class="card-header bg-warning text-dark">
+                标签池管理
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('fortune_web') }}" method="post">
+                    <input type="hidden" name="form_type" value="tag_pools">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5>吉运标签池</h5>
+                            <textarea class="form-control" name="good_tags" rows="5">{{ fortune_data.tag_pools.good | join(', ') }}</textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>中性标签池</h5>
+                            <textarea class="form-control" name="neutral_tags" rows="5">{{ fortune_data.tag_pools.neutral | join(', ') }}</textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>厄运标签池</h5>
+                            <textarea class="form-control" name="bad_tags" rows="5">{{ fortune_data.tag_pools.bad | join(', ') }}</textarea>
                         </div>
                     </div>
-                </div>
-                {% endfor %}
+                    <button type="submit" class="btn btn-warning mt-3">保存标签池变更</button>
+                </form>
             </div>
-            
-            <div class="save-container">
-                <button type="submit" class="save-btn">💾 保存所有修改</button>
+        </div>
+
+        <!-- 管理运势等级 -->
+        <div class="card mb-5">
+            <div class="card-header bg-primary text-white">
+                运势等级管理
             </div>
-        </form>
+            <div class="card-body">
+                <form action="{{ url_for('fortune_web') }}" method="post">
+                    <input type="hidden" name="form_type" value="levels">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>等级名称</th>
+                                <th>星星数 (1-7)</th>
+                                <th>星星形状</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for level in fortune_data.levels %}
+                            <tr>
+                                <td>{{ level.id }}<input type="hidden" name="level_id_{{ loop.index0 }}" value="{{ level.id }}"></td>
+                                <td><input type="text" class="form-control" name="level_name_{{ level.id }}" value="{{ level.level_name }}"></td>
+                                <td><input type="number" class="form-control" name="stars_{{ level.id }}" value="{{ level.stars }}" min="1" max="7"></td>
+                                <td>
+                                    <select class="form-select" name="star_shape_{{ level.id }}">
+                                        <option value="star" {% if level.star_shape == 'star' %}selected{% endif %}>星星 ✨</option>
+                                        <option value="heart" {% if level.star_shape == 'heart' %}selected{% endif %}>爱心 ❤️</option>
+                                        <option value="coin" {% if level.star_shape == 'coin' %}selected{% endif %}>金币 💰</option>
+                                        <option value="thorn" {% if level.star_shape == 'thorn' %}selected{% endif %}>荆棘 🥀</option>
+                                        <option value="skull" {% if level.star_shape == 'skull' %}selected{% endif %}>骷髅 💀</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button type="submit" class="btn btn-primary">保存等级变更</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 管理描述组合 -->
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                描述组合管理
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('fortune_web') }}" method="post">
+                    <input type="hidden" name="form_type" value="descriptions">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>标签组合 (逗号分隔)</th>
+                                <th>描述文本</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for desc in fortune_data.descriptions %}
+                            <tr>
+                                <td>
+                                    <input type="hidden" name="desc_id_{{ loop.index0 }}" value="{{ desc.id }}">
+                                    <input type="text" class="form-control" name="tags_{{ desc.id }}" value="{{ desc.tags | join(', ') }}">
+                                </td>
+                                <td><textarea class="form-control" name="text_{{ desc.id }}" rows="2">{{ desc.text }}</textarea></td>
+                                <td>
+                                    <button type="submit" name="delete_desc" value="{{ desc.id }}" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个描述组合吗？')">删除</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button type="submit" class="btn btn-success">保存描述变更</button>
+                </form>
+                <hr>
+                <h5 class="mt-4">添加新的描述组合</h5>
+                <form action="{{ url_for('fortune_web') }}" method="post" class="mt-3">
+                    <input type="hidden" name="form_type" value="add_description">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="new_tags" placeholder="新标签组合, 逗号分隔" required>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" name="new_text" placeholder="新的描述文本" required>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-info w-100">添加</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <a href="/" class="btn btn-secondary">返回主页</a>
+        </div>
     </div>
-
-    <script>
-        function updatePreview(itemId) {
-            const input = document.getElementById(`image_upload_${itemId}`);
-            const preview = document.getElementById(`preview_${itemId}`);
-            const file = input.files[0];
-
-            if (file) {
-                preview.src = URL.createObjectURL(file);
-                preview.classList.add('visible');
-                preview.onload = () => {
-                    URL.revokeObjectURL(preview.src); // free memory
-                }
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const previews = document.querySelectorAll('.image-preview');
-            previews.forEach(preview => {
-                preview.onerror = function() {
-                    this.style.display = 'none';
-                };
-                if (!preview.src || preview.src.endsWith('/')) {
-                    preview.style.display = 'none';
-                } else {
-                    preview.classList.add('visible');
-                }
-            });
-        });
-    </script>
 </body>
 </html>
