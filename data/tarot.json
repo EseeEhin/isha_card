@@ -1,0 +1,178 @@
+[
+  {
+    "id": 0,
+    "name": "愚人 (The Fool)",
+    "description": {
+      "upright": "开始，天真，自发性，自由精神。",
+      "reversed": "天真，鲁莽，冒险，考虑不周。"
+    }
+  },
+  {
+    "id": 1,
+    "name": "魔术师 (The Magician)",
+    "description": {
+      "upright": "显化，足智多谋，力量，有灵感的行动。",
+      "reversed": "操纵，计划不周，才能未被利用。"
+    }
+  },
+  {
+    "id": 2,
+    "name": "女祭司 (The High Priestess)",
+    "description": {
+      "upright": "直觉，神圣的女性，潜意识。",
+      "reversed": "秘密，直觉被阻挡，需要倾听内在的声音。"
+    }
+  },
+  {
+    "id": 3,
+    "name": "女皇 (The Empress)",
+    "description": {
+      "upright": "生育，女性气质，美丽，自然，富足。",
+      "reversed": "创造力受阻，依赖他人，内心空虚。"
+    }
+  },
+  {
+    "id": 4,
+    "name": "皇帝 (The Emperor)",
+    "description": {
+      "upright": "权威，建立，结构，父亲的形象。",
+      "reversed": "支配，过度控制，缺乏纪律，僵化。"
+    }
+  },
+  {
+    "id": 5,
+    "name": "教皇 (The Hierophant)",
+    "description": {
+      "upright": "精神智慧，宗教信仰，传统，制度。",
+      "reversed": "个人信仰，挑战传统，墨守成规。"
+    }
+  },
+  {
+    "id": 6,
+    "name": "恋人 (The Lovers)",
+    "description": {
+      "upright": "爱，和谐，关系，价值观的对齐，选择。",
+      "reversed": "不和谐，失衡，价值观的错位。"
+    }
+  },
+  {
+    "id": 7,
+    "name": "战车 (The Chariot)",
+    "description": {
+      "upright": "控制，意志力，胜利，行动，决心。",
+      "reversed": "失控，缺乏方向，侵略。"
+    }
+  },
+  {
+    "id": 8,
+    "name": "力量 (Strength)",
+    "description": {
+      "upright": "力量，勇气，耐心，控制，同情。",
+      "reversed": "内心的力量，自我怀疑，能量不足。"
+    }
+  },
+  {
+    "id": 9,
+    "name": "隐士 (The Hermit)",
+    "description": {
+      "upright": "灵魂探索，内省，孤独，内在引导。",
+      "reversed": "孤立，孤独，退缩。"
+    }
+  },
+  {
+    "id": 10,
+    "name": "命运之轮 (Wheel of Fortune)",
+    "description": {
+      "upright": "好运，业力，生命周期，命运，转折点。",
+      "reversed": "坏运气，抵抗改变，打破循环。"
+    }
+  },
+  {
+    "id": 11,
+    "name": "正义 (Justice)",
+    "description": {
+      "upright": "正义，公平，真理，因果，法律。",
+      "reversed": "不公平，缺乏责任感，不诚实。"
+    }
+  },
+  {
+    "id": 12,
+    "name": "倒吊人 (The Hanged Man)",
+    "description": {
+      "upright": "暂停，限制，放手，牺牲。",
+      "reversed": "拖延，无谓的牺牲，停滞不前。"
+    }
+  },
+  {
+    "id": 13,
+    "name": "死神 (Death)",
+    "description": {
+      "upright": "结束，改变，转变，过渡。",
+      "reversed": "抗拒改变，个人的转变，积极的清理。"
+    }
+  },
+  {
+    "id": 14,
+    "name": "节制 (Temperance)",
+    "description": {
+      "upright": "平衡，温和，耐心，目标。",
+      "reversed": "不平衡，过度，重新调整，失调。"
+    }
+  },
+  {
+    "id": 15,
+    "name": "恶魔 (The Devil)",
+    "description": {
+      "upright": "束缚，成瘾，物质主义，游戏。",
+      "reversed": "打破束缚，独立，重新获得控制。"
+    }
+  },
+  {
+    "id": 16,
+    "name": "塔 (The Tower)",
+    "description": {
+      "upright": "突变，剧变，混乱，启示。",
+      "reversed": "避免灾难，害怕改变。"
+    }
+  },
+  {
+    "id": 17,
+    "name": "星星 (The Star)",
+    "description": {
+      "upright": "希望，信念，目标，更新，灵性。",
+      "reversed": "缺乏信念，绝望，迷失方向。"
+    }
+  },
+  {
+    "id": 18,
+    "name": "月亮 (The Moon)",
+    "description": {
+      "upright": "幻觉，恐惧，焦虑，潜意识，直觉。",
+      "reversed": "释放恐惧，压抑的情感，内心的困惑。"
+    }
+  },
+  {
+    "id": 19,
+    "name": "太阳 (The Sun)",
+    "description": {
+      "upright": "积极，乐趣，温暖，成功，活力。",
+      "reversed": "内心的孩子，过于乐观，压抑的能量。"
+    }
+  },
+  {
+    "id": 20,
+    "name": "审判 (Judgement)",
+    "description": {
+      "upright": "审判，重生，内心的呼唤，赦免。",
+      "reversed": "自我怀疑，无视呼唤，内在的批评。"
+    }
+  },
+  {
+    "id": 21,
+    "name": "世界 (The World)",
+    "description": {
+      "upright": "完成，整合，成就，旅行。",
+      "reversed": "寻求个人的结束，捷径，延迟。"
+    }
+  }
+] 
