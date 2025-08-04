@@ -3,74 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理运势</title>
+    <title>管理运势 - 终极版</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #f8f9fa; }
         .container { max-width: 1200px; }
         .card-header { font-weight: bold; }
-        .tag-input { background-color: #e9ecef; }
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center mb-4">管理运势</h1>
-        <div class="alert alert-info">
-            <strong>说明:</strong> 在这里管理运势的标签池、基础等级和描述组合。修改后会自动保存。
-        </div>
-
-        <!-- 管理标签池 -->
-        <div class="card mb-5">
-            <div class="card-header bg-warning text-dark">
-                标签池管理
-            </div>
+    <div class="container mt-5 mb-5">
+        <h1 class="text-center mb-4">管理运势 - 终极模块化版</h1>
+        
+        <!-- 管理连接词 -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">拼接文本管理</div>
             <div class="card-body">
                 <form action="{{ url_for('fortune_web') }}" method="post">
-                    <input type="hidden" name="form_type" value="tag_pools">
+                    <input type="hidden" name="form_type" value="connectors">
+                    <div class="mb-3">
+                        <label class="form-label">开场白</label>
+                        <input type="text" class="form-control" name="intro" value="{{ fortune_data.connectors.intro }}">
+                    </div>
                     <div class="row">
                         <div class="col-md-4">
-                            <h5>吉运标签池</h5>
-                            <textarea class="form-control" name="good_tags" rows="5">{{ fortune_data.tag_pools.good | join(', ') }}</textarea>
+                            <label class="form-label">吉运结尾</label>
+                            <input type="text" class="form-control" name="outro_good" value="{{ fortune_data.connectors.outro_good }}">
                         </div>
                         <div class="col-md-4">
-                            <h5>中性标签池</h5>
-                            <textarea class="form-control" name="neutral_tags" rows="5">{{ fortune_data.tag_pools.neutral | join(', ') }}</textarea>
+                            <label class="form-label">中性结尾</label>
+                            <input type="text" class="form-control" name="outro_neutral" value="{{ fortune_data.connectors.outro_neutral }}">
                         </div>
                         <div class="col-md-4">
-                            <h5>厄运标签池</h5>
-                            <textarea class="form-control" name="bad_tags" rows="5">{{ fortune_data.tag_pools.bad | join(', ') }}</textarea>
+                            <label class="form-label">厄运结尾</label>
+                            <input type="text" class="form-control" name="outro_bad" value="{{ fortune_data.connectors.outro_bad }}">
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-warning mt-3">保存标签池变更</button>
+                    <button type="submit" class="btn btn-info mt-3">保存拼接文本</button>
                 </form>
             </div>
         </div>
 
-        <!-- 管理运势等级 -->
-        <div class="card mb-5">
-            <div class="card-header bg-primary text-white">
-                运势等级管理
+        <!-- 管理标签池 -->
+        {% for pool_name, pool_data in [('good', fortune_data.tag_pools.good), ('neutral', fortune_data.tag_pools.neutral), ('bad', fortune_data.tag_pools.bad)] %}
+        <div class="card mb-4">
+            <div class="card-header 
+                {% if pool_name == 'good' %}bg-success{% elif pool_name == 'neutral' %}bg-secondary{% else %}bg-danger{% endif %} text-white">
+                {{ {'good': '吉运', 'neutral': '中性', 'bad': '厄运'}[pool_name] }}标签池管理
             </div>
             <div class="card-body">
                 <form action="{{ url_for('fortune_web') }}" method="post">
-                    <input type="hidden" name="form_type" value="levels">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>等级名称</th>
-                                <th>星星数 (1-7)</th>
-                                <th>星星形状</th>
-                            </tr>
-                        </thead>
+                    <input type="hidden" name="form_type" value="edit_pool">
+                    <input type="hidden" name="pool_name" value="{{ pool_name }}">
+                    <table class="table table-sm">
+                        <thead><tr><th>标签</th><th>文本片段</th><th>操作</th></tr></thead>
                         <tbody>
-                            {% for level in fortune_data.levels %}
+                        {% for item in pool_data %}
                             <tr>
-                                <td>{{ level.id }}<input type="hidden" name="level_id_{{ loop.index0 }}" value="{{ level.id }}"></td>
-                                <td><input type="text" class="form-control" name="level_name_{{ level.id }}" value="{{ level.level_name }}"></td>
-                                <td><input type="number" class="form-control" name="stars_{{ level.id }}" value="{{ level.stars }}" min="1" max="7"></td>
+                                <td><input type="text" class="form-control form-control-sm" name="tag_{{ item.id }}" value="{{ item.tag }}"></td>
+                                <td><input type="text" class="form-control form-control-sm" name="text_{{ item.id }}" value="{{ item.text }}"></td>
+                                <td><button type="submit" name="delete_tag" value="{{ item.id }}" class="btn btn-outline-danger btn-sm">删除</button></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <button type="submit" class="btn btn-sm {% if pool_name == 'good' %}btn-success{% elif pool_name == 'neutral' %}btn-secondary{% else %}btn-danger{% endif %}">保存池内变更</button>
+                </form>
+                <hr>
+                <form action="{{ url_for('fortune_web') }}" method="post" class="mt-3">
+                    <input type="hidden" name="form_type" value="add_to_pool">
+                    <input type="hidden" name="pool_name" value="{{ pool_name }}">
+                    <div class="row g-2">
+                        <div class="col-auto"><span class="form-text">添加新条目:</span></div>
+                        <div class="col"><input type="text" class="form-control form-control-sm" name="new_tag" placeholder="新标签" required></div>
+                        <div class="col"><input type="text" class="form-control form-control-sm" name="new_text" placeholder="新文本片段" required></div>
+                        <div class="col-auto"><button type="submit" class="btn btn-sm btn-outline-primary">添加</button></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- 管理运势等级 -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">运势等级管理</div>
+            <div class="card-body">
+                <form action="{{ url_for('fortune_web') }}" method="post">
+                    <input type="hidden" name="form_type" value="levels">
+                    <table class="table table-sm">
+                        <thead><tr><th>ID</th><th>等级名称</th><th>星星数 (1-7)</th><th>星星形状</th></tr></thead>
+                        <tbody>
+                        {% for level in fortune_data.levels %}
+                            <tr>
+                                <td>{{ level.id }}</td>
+                                <td><input type="text" class="form-control form-control-sm" name="level_name_{{ level.id }}" value="{{ level.level_name }}"></td>
+                                <td><input type="number" class="form-control form-control-sm" name="stars_{{ level.id }}" value="{{ level.stars }}" min="1" max="7"></td>
                                 <td>
-                                    <select class="form-select" name="star_shape_{{ level.id }}">
+                                    <select class="form-select form-select-sm" name="star_shape_{{ level.id }}">
                                         <option value="star" {% if level.star_shape == 'star' %}selected{% endif %}>星星 ✨</option>
                                         <option value="heart" {% if level.star_shape == 'heart' %}selected{% endif %}>爱心 ❤️</option>
                                         <option value="coin" {% if level.star_shape == 'coin' %}selected{% endif %}>金币 💰</option>
@@ -79,65 +108,14 @@
                                     </select>
                                 </td>
                             </tr>
-                            {% endfor %}
+                        {% endfor %}
                         </tbody>
                     </table>
-                    <button type="submit" class="btn btn-primary">保存等级变更</button>
+                    <button type="submit" class="btn btn-primary btn-sm">保存等级变更</button>
                 </form>
             </div>
         </div>
 
-        <!-- 管理描述组合 -->
-        <div class="card">
-            <div class="card-header bg-success text-white">
-                描述组合管理
-            </div>
-            <div class="card-body">
-                <form action="{{ url_for('fortune_web') }}" method="post">
-                    <input type="hidden" name="form_type" value="descriptions">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>标签组合 (逗号分隔)</th>
-                                <th>描述文本</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for desc in fortune_data.descriptions %}
-                            <tr>
-                                <td>
-                                    <input type="hidden" name="desc_id_{{ loop.index0 }}" value="{{ desc.id }}">
-                                    <input type="text" class="form-control" name="tags_{{ desc.id }}" value="{{ desc.tags | join(', ') }}">
-                                </td>
-                                <td><textarea class="form-control" name="text_{{ desc.id }}" rows="2">{{ desc.text }}</textarea></td>
-                                <td>
-                                    <button type="submit" name="delete_desc" value="{{ desc.id }}" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个描述组合吗？')">删除</button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    <button type="submit" class="btn btn-success">保存描述变更</button>
-                </form>
-                <hr>
-                <h5 class="mt-4">添加新的描述组合</h5>
-                <form action="{{ url_for('fortune_web') }}" method="post" class="mt-3">
-                    <input type="hidden" name="form_type" value="add_description">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <input type="text" class="form-control" name="new_tags" placeholder="新标签组合, 逗号分隔" required>
-                        </div>
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" name="new_text" placeholder="新的描述文本" required>
-                        </div>
-                        <div class="col-md-2">
-                            <button type="submit" class="btn btn-info w-100">添加</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
         <div class="text-center mt-4">
             <a href="/" class="btn btn-secondary">返回主页</a>
         </div>

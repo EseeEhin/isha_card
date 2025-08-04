@@ -108,7 +108,7 @@ async def on_error(event, *args, **kwargs):
 async def fortune(interaction: discord.Interaction):
     try:
         fortune_data = bot.load_data(bot.fortune_file)
-        if not all(k in fortune_data for k in ["levels", "descriptions", "tag_pools"]):
+        if not all(k in fortune_data for k in ["levels", "tag_pools", "connectors"]):
             await interaction.response.send_message("抱歉，运势数据结构不正确，请检查 `fortune.json`。")
             return
 
@@ -116,66 +116,68 @@ async def fortune(interaction: discord.Interaction):
         chosen_level = random.choice(fortune_data["levels"])
         stars = chosen_level.get("stars", 3)
 
-        # 2. 根据星级决定可用的标签池
+        # 2. 根据星级决定运势类型和标签池
         tag_pools = fortune_data.get("tag_pools", {})
         good_pool = tag_pools.get("good", [])
         bad_pool = tag_pools.get("bad", [])
         neutral_pool = tag_pools.get("neutral", [])
         
-        available_tags = []
-        if stars > 5: # 好运
-            available_tags = good_pool + neutral_pool
-        elif stars <= 2: # 厄运
-            available_tags = bad_pool + neutral_pool
-        else: # 中性运
-            available_tags = neutral_pool
-        
-        # 3. 准备描述数据以便快速查找
-        description_map = {
-            tuple(sorted(desc["tags"])): desc["text"] 
-            for desc in fortune_data["descriptions"]
-        }
+        luck_type = "neutral"
+        if stars >= 5: luck_type = "good"
+        elif stars <= 2: luck_type = "bad"
 
-        # 4. 从可用标签池中随机抽取标签组合，并确保该组合有对应的描述
-        selected_tags = []
-        final_description = ""
+        # 3. 模块化抽取标签和文本
+        selected_tag_objects = []
         
-        if available_tags:
-            # 安全循环，尝试最多10次找到一个有效的标签组合
-            for _ in range(10):
-                max_tags_to_pick = min(2, len(available_tags))
-                if max_tags_to_pick < 1: break
-                num_to_pick = random.randint(1, max_tags_to_pick)
-                
-                sampled_tags = random.sample(available_tags, num_to_pick)
-                tag_key = tuple(sorted(sampled_tags))
-                
-                if tag_key in description_map:
-                    selected_tags = sampled_tags
-                    final_description = description_map[tag_key]
-                    break
+        # 保底抽取
+        if luck_type == "good" and good_pool:
+            selected_tag_objects.append(random.choice(good_pool))
+        elif luck_type == "bad" and bad_pool:
+            selected_tag_objects.append(random.choice(bad_pool))
+        elif neutral_pool: # 中性运或吉/厄池为空时的保底
+            selected_tag_objects.append(random.choice(neutral_pool))
+
+        # 根据运气类型，决定额外抽取的中性标签数量（0, 1, 或 2个）
+        num_additional_tags = 0
+        if neutral_pool: # 只有中性池不为空时才可能额外抽取
+            if luck_type == "neutral":
+                # 中性运气，可以额外抽 0-2 个
+                num_additional_tags = random.randint(0, min(2, len(neutral_pool) - 1))
+            else:
+                # 吉/厄运，可以额外抽 0-2 个
+                num_additional_tags = random.randint(0, min(2, len(neutral_pool)))
+
+        if num_additional_tags > 0:
+            # 获取已经选择的标签的id，避免重复
+            existing_ids = {t['id'] for t in selected_tag_objects}
+            # 筛选出中性池中可以抽取的标签
+            drawable_neutral_pool = [t for t in neutral_pool if t['id'] not in existing_ids]
             
-            # 如果循环10次都没找到，则降级为只抽一个标签再试一次
-            if not final_description:
-                for tag in random.sample(available_tags, k=len(available_tags)):
-                    tag_key = tuple(sorted([tag]))
-                    if tag_key in description_map:
-                        selected_tags = [tag]
-                        final_description = description_map[tag_key]
-                        break
+            # 确保抽取的数量不超过可抽取的数量
+            num_to_draw = min(num_additional_tags, len(drawable_neutral_pool))
+
+            if num_to_draw > 0:
+                additional_tags = random.sample(drawable_neutral_pool, k=num_to_draw)
+                selected_tag_objects.extend(additional_tags)
+
+        # 4. 拼接最终描述
+        tags_to_display = [obj['tag'] for obj in selected_tag_objects]
+        text_fragments = [obj['text'] for obj in selected_tag_objects]
         
-        # 如果还是没有，给一个默认的最终保底描述
-        if not final_description:
-            final_description = "血族猫娘今天有点累，她只是静静地看着你，什么也没说。"
+        connectors = fortune_data.get("connectors", {})
+        intro = connectors.get("intro", "")
+        outro = connectors.get(f"outro_{luck_type}", "")
+        
+        # 确保结尾标点符号正确
+        final_text = intro + " " + "".join(text_fragments).strip().rstrip('，').rstrip('。').rstrip(',') + "。"
+        if outro:
+            final_text += " " + outro
 
         # 5. 构建 Embed
         level_name = chosen_level["level_name"]
-        if stars > 4: # 吉
-            color = discord.Color.gold()
-        elif stars <= 2: # 厄
-            color = discord.Color.dark_purple()
-        else: # 中
-            color = discord.Color.light_grey()
+        color = discord.Color.light_grey()
+        if luck_type == "good": color = discord.Color.gold()
+        elif luck_type == "bad": color = discord.Color.dark_purple()
 
         star_icons = {'heart': '❤️', 'coin': '💰', 'star': '✨', 'thorn': '🥀', 'skull': '💀'}
         star_symbol = star_icons.get(chosen_level.get("star_shape", "star"), '✨')
@@ -190,11 +192,11 @@ async def fortune(interaction: discord.Interaction):
         embed.add_field(name="今日运势", value=f"**{level_name}**", inline=False)
         embed.add_field(name="幸运星", value=stars_display, inline=False)
         
-        if selected_tags:
-            tags_display = " | ".join([f"`{tag}`" for tag in selected_tags])
-            embed.add_field(name="运势标签", value=tags_display, inline=False)
+        if tags_to_display:
+            tags_display_str = " | ".join([f"`{tag}`" for tag in tags_to_display])
+            embed.add_field(name="运势标签", value=tags_display_str, inline=False)
             
-        embed.add_field(name="血族猫娘的低语", value=final_description, inline=False)
+        embed.add_field(name="血族猫娘的低语", value=final_text, inline=False)
         
         embed.set_footer(text=f"来自暗影与月光下的祝福 | {bot.user.name}")
         
@@ -368,10 +370,33 @@ def fortune_web():
         if request.method == 'POST':
             form_type = request.form.get('form_type')
 
-            if form_type == 'tag_pools':
-                fortune_data['tag_pools']['good'] = [tag.strip() for tag in request.form.get('good_tags', '').split(',') if tag.strip()]
-                fortune_data['tag_pools']['neutral'] = [tag.strip() for tag in request.form.get('neutral_tags', '').split(',') if tag.strip()]
-                fortune_data['tag_pools']['bad'] = [tag.strip() for tag in request.form.get('bad_tags', '').split(',') if tag.strip()]
+            if form_type == 'connectors':
+                fortune_data['connectors']['intro'] = request.form.get('intro')
+                fortune_data['connectors']['outro_good'] = request.form.get('outro_good')
+                fortune_data['connectors']['outro_neutral'] = request.form.get('outro_neutral')
+                fortune_data['connectors']['outro_bad'] = request.form.get('outro_bad')
+
+            elif form_type == 'edit_pool':
+                pool_name = request.form.get('pool_name')
+                if pool_name in fortune_data['tag_pools']:
+                    if 'delete_tag' in request.form:
+                        tag_id_to_delete = int(request.form.get('delete_tag'))
+                        fortune_data['tag_pools'][pool_name] = [t for t in fortune_data['tag_pools'][pool_name] if t['id'] != tag_id_to_delete]
+                    else:
+                        for item in fortune_data['tag_pools'][pool_name]:
+                            item_id = item['id']
+                            item['tag'] = request.form.get(f'tag_{item_id}', item['tag'])
+                            item['text'] = request.form.get(f'text_{item_id}', item['text'])
+            
+            elif form_type == 'add_to_pool':
+                pool_name = request.form.get('pool_name')
+                if pool_name in fortune_data['tag_pools']:
+                    new_tag = request.form.get('new_tag')
+                    new_text = request.form.get('new_text')
+                    if new_tag and new_text:
+                        pool = fortune_data['tag_pools'][pool_name]
+                        max_id = max(t['id'] for t in pool) if pool else 0
+                        pool.append({'id': max_id + 1, 'tag': new_tag, 'text': new_text})
 
             elif form_type == 'levels':
                 for level in fortune_data['levels']:
@@ -379,30 +404,6 @@ def fortune_web():
                     level['level_name'] = request.form.get(f'level_name_{level_id}', level['level_name'])
                     level['stars'] = int(request.form.get(f'stars_{level_id}', level['stars']))
                     level['star_shape'] = request.form.get(f'star_shape_{level_id}', level['star_shape'])
-
-            elif form_type == 'descriptions':
-                if 'delete_desc' in request.form:
-                    desc_id_to_delete = int(request.form.get('delete_desc'))
-                    fortune_data['descriptions'] = [d for d in fortune_data['descriptions'] if d['id'] != desc_id_to_delete]
-                else:
-                    for desc in fortune_data['descriptions']:
-                        desc_id = desc['id']
-                        tags_str = request.form.get(f'tags_{desc_id}', '')
-                        desc['tags'] = [tag.strip() for tag in tags_str.split(',') if tag.strip()]
-                        desc['text'] = request.form.get(f'text_{desc_id}', desc['text'])
-            
-            elif form_type == 'add_description':
-                new_tags_str = request.form.get('new_tags', '')
-                new_text = request.form.get('new_text', '')
-                if new_tags_str and new_text:
-                    new_tags = [tag.strip() for tag in new_tags_str.split(',') if tag.strip()]
-                    max_id = max(d['id'] for d in fortune_data['descriptions']) if fortune_data['descriptions'] else 0
-                    new_desc = {
-                        "id": max_id + 1,
-                        "tags": new_tags,
-                        "text": new_text
-                    }
-                    fortune_data['descriptions'].append(new_desc)
 
             bot.save_data(bot.fortune_file, fortune_data)
             return redirect(url_for('fortune_web'))
