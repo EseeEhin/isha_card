@@ -11,6 +11,9 @@ from dotenv import load_dotenv
 import logging
 import logging.handlers
 from werkzeug.utils import secure_filename
+from PIL import Image, ImageDraw, ImageFont
+import io
+import textwrap
 
 # 设置日志
 logging.basicConfig(level=logging.INFO)
@@ -100,59 +103,169 @@ async def on_ready():
 async def on_error(event, *args, **kwargs):
     logger.error(f"Error in {event}: {args} {kwargs}")
 
+def create_fortune_image(fortune_data: dict):
+    """根据运势数据生成一张图片"""
+    # --- 资源路径 ---
+    base_path = 'static'
+    font_path = os.path.join(base_path, 'fonts', 'font.ttf')
+    default_bg_path = os.path.join(base_path, 'images', 'default_background.png')
+    
+    # --- 图像尺寸和颜色 ---
+    img_width, img_height = 800, 600
+    text_color = (255, 255, 255)
+    shadow_color = (0, 0, 0)
+
+    # --- 加载背景 ---
+    bg_path = fortune_data.get("image", default_bg_path)
+    if not os.path.exists(bg_path):
+        bg_path = default_bg_path
+    
+    try:
+        background = Image.open(bg_path).convert("RGBA").resize((img_width, img_height))
+    except FileNotFoundError:
+        logger.warning(f"Background image not found at {bg_path}, creating a placeholder background.")
+        # Create a gradient background if default is not found
+        background = Image.new("RGBA", (img_width, img_height))
+        draw = ImageDraw.Draw(background)
+        for i in range(img_height):
+            # A simple dark blue/purple gradient
+            color = (20 + i // 10, 15 + i // 12, 40 + i // 8)
+            draw.line([(0, i), (img_width, i)], fill=color)
+
+    draw = ImageDraw.Draw(background)
+
+    # --- 加载字体 ---
+    try:
+        font_large = ImageFont.truetype(font_path, 60)
+        font_medium = ImageFont.truetype(font_path, 28)
+        font_small = ImageFont.truetype(font_path, 22)
+    except IOError:
+        logger.warning(f"Font file not found at {font_path}, using default font.")
+        font_large = ImageFont.load_default()
+        font_medium = ImageFont.load_default()
+        font_small = ImageFont.load_default()
+
+    # --- 绘制星星 ---
+    star_shape = fortune_data.get("star_shape", "star")
+    star_filled_path = os.path.join(base_path, 'images', f'{star_shape}_filled.png')
+    star_empty_path = os.path.join(base_path, 'images', f'{star_shape}_empty.png')
+    
+    # --- Star Drawing Logic ---
+    stars_count = fortune_data.get("stars", 0)
+    total_stars = 7
+    star_y = 300
+    star_size = 50
+    star_spacing = 5
+    total_star_width = total_stars * (star_size + star_spacing)
+    star_x_start = (img_width - total_star_width) // 2
+
+    try:
+        # Try to load images first
+        star_filled_img = Image.open(star_filled_path).convert("RGBA").resize((star_size, star_size))
+        star_empty_img = Image.open(star_empty_path).convert("RGBA").resize((star_size, star_size))
+
+        for i in range(total_stars):
+            star_to_paste = star_filled_img if i < stars_count else star_empty_img
+            x_pos = star_x_start + i * (star_size + star_spacing)
+            background.paste(star_to_paste, (x_pos, star_y), star_to_paste)
+
+    except FileNotFoundError:
+        logger.warning(f"Star images for '{star_shape}' not found. Drawing placeholder shapes.")
+        # Fallback to drawing shapes if images are missing
+        for i in range(total_stars):
+            x_pos = star_x_start + i * (star_size + star_spacing) + star_size // 2
+            y_pos = star_y + star_size // 2
+            is_filled = i < stars_count
+            
+            fill_color = (255, 223, 0) if is_filled else None
+            outline_color = (255, 223, 0)
+            
+            # Simple placeholder drawing logic
+            if "star" in star_shape:
+                # Draw a 5-pointed star
+                points = []
+                for j in range(5):
+                    angle = j * 4 * 3.14159 / 5
+                    r = star_size // 2 if j % 2 == 0 else star_size // 4
+                    points.append((x_pos + r * -_sin(angle), y_pos + r * -_cos(angle)))
+                draw.polygon(points, fill=fill_color, outline=outline_color, width=2)
+            elif "heart" in star_shape:
+                # Draw a heart
+                draw.ellipse((x_pos - star_size//4, y_pos - star_size//4, x_pos + star_size//4, y_pos + star_size//4), fill=fill_color, outline=outline_color, width=2)
+            else: # Default to circles
+                radius = star_size // 2 - 2
+                if is_filled:
+                    draw.ellipse((x_pos - radius, y_pos - radius, x_pos + radius, y_pos + radius), fill=fill_color, outline=outline_color)
+                else:
+                    draw.ellipse((x_pos - radius, y_pos - radius, x_pos + radius, y_pos + radius), outline=outline_color, width=2)
+
+
+    # --- 绘制运势等级和标签 ---
+    level_text = fortune_data.get("level", "")
+    tags_text = " | ".join(fortune_data.get("tags", []))
+    combined_text = f"{level_text} - {tags_text}"
+    
+    text_y = 380
+    draw.text((img_width / 2, text_y + 2), combined_text, font=font_medium, fill=shadow_color, anchor="ms")
+    draw.text((img_width / 2, text_y), combined_text, font=font_medium, fill=text_color, anchor="ms")
+
+# --- 绘制描述 ---
+    description = fortune_data.get("description", "")
+    # A bit more robust wrapping
+    wrapped_text = ""
+    if font_small.getsize("a")[0] > 0: # Check if font is not default
+        avg_char_width = font_small.getsize("A")[0]
+        wrap_width = (img_width - 100) // avg_char_width
+        wrapped_text = textwrap.fill(description, width=wrap_width if wrap_width > 0 else 45)
+    else: # Fallback for default font
+        wrapped_text = textwrap.fill(description, width=45)
+
+    desc_y = 440
+    draw.text((img_width / 2, desc_y + 2), wrapped_text, font=font_small, fill=shadow_color, anchor="ms", align="center")
+    draw.text((img_width / 2, desc_y), wrapped_text, font=font_small, fill=text_color, anchor="ms", align="center")
+
+    # --- 保存到内存 ---
+    img_byte_arr = io.BytesIO()
+    background.save(img_byte_arr, format='PNG')
+    img_byte_arr.seek(0)
+    
+    return img_byte_arr
+
+# Helper functions for drawing shapes, to avoid new imports in global scope
+def _sin(degrees):
+    import math
+    return math.sin(math.radians(degrees))
+
+def _cos(degrees):
+    import math
+    return math.cos(math.radians(degrees))
+
 # /fortune 指令
 @bot.tree.command(name="运势", description="抽一张今日运势牌")
 async def fortune(interaction: discord.Interaction):
     try:
+        await interaction.response.defer() # 延迟响应，因为图片生成可能需要时间
+
         fortunes = bot.load_data(bot.fortune_file)
         if not fortunes:
-            await interaction.response.send_message("抱歉，运势数据正在维护中，请稍后再试。")
+            await interaction.followup.send("抱歉，运势数据正在维护中，请稍后再试。")
             return
 
         chosen_fortune = random.choice(fortunes)
         
-        if "吉" in chosen_fortune["level"] or "高照" in chosen_fortune["level"]:
-            color = discord.Color.gold()
-        elif "厄" in chosen_fortune["level"] or "笼罩" in chosen_fortune["level"]:
-            color = discord.Color.dark_purple()
-        else:
-            color = discord.Color.light_grey()
+        # 生成图片
+        image_file_bytes = create_fortune_image(chosen_fortune)
+        
+        # 创建 discord.File 对象
+        picture = discord.File(fp=image_file_bytes, filename="fortune.png")
+        
+        # 发送消息
+        message = f"喵~ {interaction.user.mention}，来看看你的今日运势吧！"
+        await interaction.followup.send(message, file=picture)
 
-        star_icons = {'heart': '❤️', 'coin': '💰', 'star': '✨', 'thorn': '🥀', 'skull': '💀'}
-        star_symbol = star_icons.get(chosen_fortune.get("star_shape", "star"), '✨')
-        stars_display = star_symbol * chosen_fortune["stars"] + '🖤' * (7 - chosen_fortune["stars"])
-
-        embed = discord.Embed(
-            title=f"血族猫娘的今日占卜",
-            description=f"喵~ {interaction.user.mention}，来看看你的今日运势吧！",
-            color=color
-        )
-        
-        embed.add_field(name="今日运势", value=f"**{chosen_fortune['level']}**", inline=False)
-        embed.add_field(name="幸运星", value=stars_display, inline=False)
-        
-        if chosen_fortune.get("tags"):
-            tags = " | ".join([f"`{tag}`" for tag in chosen_fortune["tags"]])
-            embed.add_field(name="运势标签", value=tags, inline=False)
-            
-        embed.add_field(name="血族猫娘的低语", value=chosen_fortune["description"], inline=False)
-        
-        image_path = chosen_fortune.get("image")
-        if image_path:
-            if image_path.startswith('http'):
-                image_url = image_path
-            elif os.path.exists(image_path):
-                image_filename = os.path.basename(image_path)
-                base_url = os.getenv("BASE_URL", "http://localhost:7860") 
-                image_url = f"{base_url}/{image_path}"
-                embed.set_image(url=image_url)
-        
-        embed.set_footer(text=f"来自暗影与月光下的祝福 | {bot.user.name}")
-        
-        await interaction.response.send_message(embed=embed)
     except Exception as e:
         logger.error(f"Error in fortune command: {e}")
-        await interaction.response.send_message("抱歉，出现了一些问题，请稍后再试。", ephemeral=True)
+        await interaction.followup.send("抱歉，出现了一些问题，请稍后再试。", ephemeral=True)
 
 # /tarot 指令
 @bot.tree.command(name="塔罗", description="抽一张塔罗牌")

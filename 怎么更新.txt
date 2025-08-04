@@ -1,0 +1,5 @@
+SSH登录
+cd isha_card
+git pull
+(pip install -r requirements.txt) (如果加了新库)
+sudo systemctl restart my-bot
