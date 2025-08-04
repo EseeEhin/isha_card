@@ -137,15 +137,20 @@ async def fortune(interaction: discord.Interaction):
         elif neutral_pool: # 中性运或吉/厄池为空时的保底
             selected_tag_objects.append(random.choice(neutral_pool))
 
-        # 根据运气类型，决定额外抽取的中性标签数量（0, 1, 或 2个）
+        # 根据运气类型，决定额外抽取的中性标签数量（最多可使总数达到5个）
         num_additional_tags = 0
         if neutral_pool: # 只有中性池不为空时才可能额外抽取
             if luck_type == "neutral":
-                # 中性运气，可以额外抽 0-2 个
-                num_additional_tags = random.randint(0, min(2, len(neutral_pool) - 1))
+                # 中性运气，额外抽 0-4 个 (总数 1-5)
+                # 需要确保不会超出池子大小
+                max_extra = min(4, len(neutral_pool) - 1)
+                if max_extra >= 0:
+                    num_additional_tags = random.randint(0, max_extra)
             else:
-                # 吉/厄运，可以额外抽 0-2 个
-                num_additional_tags = random.randint(0, min(2, len(neutral_pool)))
+                # 吉/厄运，额外抽 0-4 个 (总数 1-5)
+                max_extra = min(4, len(neutral_pool))
+                if max_extra >= 0:
+                    num_additional_tags = random.randint(0, max_extra)
 
         if num_additional_tags > 0:
             # 获取已经选择的标签的id，避免重复
