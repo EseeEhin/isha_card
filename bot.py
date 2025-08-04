@@ -205,26 +205,39 @@ def create_fortune_image(fortune_data: dict):
     # --- 绘制运势等级和标签 ---
     level_text = fortune_data.get("level", "")
     tags_text = " | ".join(fortune_data.get("tags", []))
-    combined_text = f"{level_text} - {tags_text}"
+    combined_text = f"{level_text} - {tags_text}" if tags_text else level_text
     
     text_y = 380
-    draw.text((img_width / 2, text_y + 2), combined_text, font=font_medium, fill=shadow_color, anchor="ms")
-    draw.text((img_width / 2, text_y), combined_text, font=font_medium, fill=text_color, anchor="ms")
+    # Manual centering for compatibility
+    bbox = font_medium.getbbox(combined_text)
+    text_width = bbox[2] - bbox[0]
+    text_x = (img_width - text_width) / 2
+    draw.text((text_x, text_y + 2), combined_text, font=font_medium, fill=shadow_color)
+    draw.text((text_x, text_y), combined_text, font=font_medium, fill=text_color)
 
-# --- 绘制描述 ---
+    # --- 绘制描述 ---
     description = fortune_data.get("description", "")
     # A bit more robust wrapping
     wrapped_text = ""
-    if font_small.getsize("a")[0] > 0: # Check if font is not default
+    try:
+        # Use getbbox for modern Pillow, more accurate
+        avg_char_width = font_small.getbbox("A")[2]
+        wrap_width = (img_width - 100) // avg_char_width
+        wrapped_text = textwrap.fill(description, width=wrap_width if wrap_width > 0 else 45)
+    except AttributeError: # Fallback for older Pillow
         avg_char_width = font_small.getsize("A")[0]
         wrap_width = (img_width - 100) // avg_char_width
         wrapped_text = textwrap.fill(description, width=wrap_width if wrap_width > 0 else 45)
-    else: # Fallback for default font
-        wrapped_text = textwrap.fill(description, width=45)
 
     desc_y = 440
-    draw.text((img_width / 2, desc_y + 2), wrapped_text, font=font_small, fill=shadow_color, anchor="ms", align="center")
-    draw.text((img_width / 2, desc_y), wrapped_text, font=font_small, fill=text_color, anchor="ms", align="center")
+    # Manual centering for multi-line text
+    desc_bbox = draw.multiline_textbbox((0,0), wrapped_text, font=font_small, align="center")
+    desc_width = desc_bbox[2] - desc_bbox[0]
+    desc_height = desc_bbox[3] - desc_bbox[1]
+    desc_x = (img_width - desc_width) / 2
+    
+    draw.text((desc_x, desc_y + 2), wrapped_text, font=font_small, fill=shadow_color, align="center")
+    draw.text((desc_x, desc_y), wrapped_text, font=font_small, fill=text_color, align="center")
 
     # --- 保存到内存 ---
     img_byte_arr = io.BytesIO()
