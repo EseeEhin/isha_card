@@ -145,11 +145,10 @@
                     
                     <div class="form-group">
                         <label for="image_upload_{{ card.id }}">上传新卡面 (会覆盖旧图片):</label>
-                        <input type="file" name="image_upload_{{ card.id }}" id="image_upload_{{ card.id }}" accept="image/*" onchange="updatePreview('{{ card.id }}')">
-                        <div class="image-preview-container">
-                            {% set image_url = card.image if card.image and card.image.startswith('http') else url_for('static', filename=card.image.split('static/')[-1]) if card.image else '' %}
-                            <img id="preview_{{ card.id }}" src="{{ image_url }}" class="image-preview {{ 'visible' if image_url else '' }}" alt="图片预览">
-                        </div>
+                        <input type="file" name="image_upload_{{ card.id }}" id="image_upload_{{ card.id }}" accept="image/*">
+                        {% if card.image %}
+                            <p><small class="text-muted">当前链接: {{ card.image }}</small></p>
+                        {% endif %}
                     </div>
                     
                     <div class="form-group">
@@ -166,36 +165,5 @@
         </form>
     </div>
 
-    <script>
-        function updatePreview(cardId) {
-            const input = document.getElementById(`image_upload_${cardId}`);
-            const preview = document.getElementById(`preview_${cardId}`);
-            const file = input.files[0];
-
-            if (file) {
-                preview.src = URL.createObjectURL(file);
-                preview.classList.add('visible');
-                preview.onload = () => {
-                    URL.revokeObjectURL(preview.src); // free memory
-                }
-            }
-        }
-
-        // Ensure existing images are displayed correctly on load
-        document.addEventListener('DOMContentLoaded', function() {
-            const previews = document.querySelectorAll('.image-preview');
-            previews.forEach(preview => {
-                // Hide broken images or empty src
-                preview.onerror = function() {
-                    this.style.display = 'none';
-                };
-                if (preview.getAttribute('src')) {
-                    preview.classList.add('visible');
-                } else {
-                    preview.style.display = 'none';
-                }
-            });
-        });
-    </script>
 </body>
 </html>
