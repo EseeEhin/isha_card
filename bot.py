@@ -108,14 +108,23 @@ async def on_error(event, *args, **kwargs):
 # /fortune 指令
 def generate_fortune_card(level, tags, text, image_path):
     try:
-        # 加载本地字体文件
-        font_path = os.path.join('static', 'fonts', 'SourceHanSans.otf')
+        # --- 字体加载（绝对路径 + 强化调试日志）---
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        font_path = os.path.join(base_dir, 'static', 'fonts', 'SourceHanSans.otf')
+        
+        # 强化日志，用于最终调试
+        logger.info(f"--- Font Loading Debug ---")
+        logger.info(f"Script base directory: {base_dir}")
+        logger.info(f"Calculated font absolute path: {font_path}")
+        logger.info(f"Does font file exist at path? -> {os.path.exists(font_path)}")
+        logger.info(f"--- End Debug ---")
+
         try:
             font_bold = ImageFont.truetype(font_path, 36)
             font_regular = ImageFont.truetype(font_path, 24)
             font_small = ImageFont.truetype(font_path, 20)
-        except IOError:
-            logger.error(f"Font file not found at {font_path}. Falling back to default font.")
+        except IOError as e:
+            logger.error(f"CRITICAL: Failed to load font from {font_path}. Error: {e}. Falling back to default font.")
             font_bold = ImageFont.load_default()
             font_regular = ImageFont.load_default()
             font_small = ImageFont.load_default()
