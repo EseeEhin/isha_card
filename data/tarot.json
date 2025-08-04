@@ -3,176 +3,198 @@
     "id": 0,
     "name": "愚人 (The Fool)",
     "description": {
-      "upright": "开始，天真，自发性，自由精神。",
-      "reversed": "天真，鲁莽，冒险，考虑不周。"
-    }
+      "upright": "新的开始, 无限可能, 追随内心。",
+      "reversed": "鲁莽行事, 逃避责任, 固执天真。"
+    },
+    "image": "https://i0.hdslb.com/bfs/article/27e2b0a1fd9d4eee784b032cfdfc2e13298252208.png"
   },
   {
     "id": 1,
     "name": "魔术师 (The Magician)",
     "description": {
-      "upright": "显化，足智多谋，力量，有灵感的行动。",
-      "reversed": "操纵，计划不周，才能未被利用。"
-    }
+      "upright": "意志坚定, 资源充足, 采取行动。",
+      "reversed": "才能滥用, 欺骗操控, 计划不周。"
+    },
+    "image": "https://i0.hdslb.com/bfs/article/9b0f9b7a43a4db99758d10117aa8eeb7298252208.png"
   },
   {
     "id": 2,
     "name": "女祭司 (The High Priestess)",
     "description": {
-      "upright": "直觉，神圣的女性，潜意识。",
-      "reversed": "秘密，直觉被阻挡，需要倾听内在的声音。"
-    }
+      "upright": "相信直觉, 探寻奥秘, 保持静默。",
+      "reversed": "隐藏秘密, 直觉失灵, 思绪混乱。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/d7c9aa8eae61d627545760ddecd8fe74298252208.png@922w_1634h.avif"
   },
   {
     "id": 3,
     "name": "女皇 (The Empress)",
     "description": {
-      "upright": "生育，女性气质，美丽，自然，富足。",
-      "reversed": "创造力受阻，依赖他人，内心空虚。"
-    }
+      "upright": "感官享受, 创造丰收, 关爱自然。",
+      "reversed": "依赖他人, 创意受阻, 关系紧张。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/4ad316d3d66016f9e4166f0a4b0e0062298252208.png@922w_1634h.avif"
   },
   {
     "id": 4,
     "name": "皇帝 (The Emperor)",
     "description": {
-      "upright": "权威，建立，结构，父亲的形象。",
-      "reversed": "支配，过度控制，缺乏纪律，僵化。"
-    }
+      "upright": "建立秩序, 掌控全局, 勇于担当。",
+      "reversed": "滥用权力, 固执己见, 缺乏自律。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/2c5de56e34ec76be12934ee18d9aa31f298252208.png@922w_1634h.avif"
   },
   {
     "id": 5,
     "name": "教皇 (The Hierophant)",
     "description": {
-      "upright": "精神智慧，宗教信仰，传统，制度。",
-      "reversed": "个人信仰，挑战传统，墨守成规。"
-    }
+      "upright": "遵循传统, 寻求指导, 融入团体。",
+      "reversed": "挑战权威, 打破常规, 思想僵化。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/82de85397f341719848d7c3b1ae15239298252208.png@922w_1634h.avif"
   },
   {
     "id": 6,
     "name": "恋人 (The Lovers)",
     "description": {
-      "upright": "爱，和谐，关系，价值观的对齐，选择。",
-      "reversed": "不和谐，失衡，价值观的错位。"
-    }
+      "upright": "建立关系, 做出选择, 价值观契合。",
+      "reversed": "关系失和, 错误决定, 内心冲突。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/3d0c28829dddfb6f7fb8720272842cc3298252208.png@922w_1634h.avif"
   },
   {
     "id": 7,
     "name": "战车 (The Chariot)",
     "description": {
-      "upright": "控制，意志力，胜利，行动，决心。",
-      "reversed": "失控，缺乏方向，侵略。"
-    }
+      "upright": "意志坚定, 克服障碍, 取得胜利。",
+      "reversed": "失去方向, 行动鲁莽, 缺乏自制。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/061c77a61af2d1774ef45314d6968d77298252208.png@922w_1634h.avif"
   },
   {
     "id": 8,
     "name": "力量 (Strength)",
     "description": {
-      "upright": "力量，勇气，耐心，控制，同情。",
-      "reversed": "内心的力量，自我怀疑，能量不足。"
-    }
+      "upright": "内在力量, 充满勇气, 满怀同情。",
+      "reversed": "缺乏自信, 表现软弱, 能量不足。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/07033bfc2e36a8e5a9cce37ab4d3ecb1298252208.png@922w_1634h.avif"
   },
   {
     "id": 9,
     "name": "隐士 (The Hermit)",
     "description": {
-      "upright": "灵魂探索，内省，孤独，内在引导。",
-      "reversed": "孤立，孤独，退缩。"
-    }
+      "upright": "向内探索, 寻求真理, 保持独处。",
+      "reversed": "感到孤立, 逃避现实, 固步自封。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/308b801fb82069d24db0ddba8f6b4a22298252208.png@922w_1634h.avif"
   },
   {
     "id": 10,
     "name": "命运之轮 (Wheel of Fortune)",
     "description": {
-      "upright": "好运，业力，生命周期，命运，转折点。",
-      "reversed": "坏运气，抵抗改变，打破循环。"
-    }
+      "upright": "命运转折, 把握机遇, 顺其自然。",
+      "reversed": "时运不济, 抗拒改变, 循环往复。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/71948eddf75c1fc3692483e4272e02c4298252208.png@922w_1634h.avif"
   },
   {
     "id": 11,
     "name": "正义 (Justice)",
     "description": {
-      "upright": "正义，公平，真理，因果，法律。",
-      "reversed": "不公平，缺乏责任感，不诚实。"
-    }
+      "upright": "公平公正, 承担责任, 坚守真理。",
+      "reversed": "偏袒不公, 逃避责任, 谎言欺骗。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/f73a1d01da4ff8484f4d785d8da2dce5298252208.png@922w_1634h.avif"
   },
   {
     "id": 12,
     "name": "倒吊人 (The Hanged Man)",
     "description": {
-      "upright": "暂停，限制，放手，牺牲。",
-      "reversed": "拖延，无谓的牺牲，停滞不前。"
-    }
+      "upright": "顺其自然, 改变视角, 等待时机。",
+      "reversed": "无谓牺牲, 停滞不前, 做出拖延。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/12b1823032843c0d8c79f36b3ea0675c298252208.png@922w_1634h.avif"
   },
   {
     "id": 13,
     "name": "死神 (Death)",
     "description": {
-      "upright": "结束，改变，转变，过渡。",
-      "reversed": "抗拒改变，个人的转变，积极的清理。"
-    }
+      "upright": "结束旧事, 迎来转变, 获得新生。",
+      "reversed": "抗拒改变, 恐惧未知, 停滞不前。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/d18ca3ec2fa2755ff7afc332fdb7ac0c298252208.png@922w_1634h.avif"
   },
   {
     "id": 14,
     "name": "节制 (Temperance)",
     "description": {
-      "upright": "平衡，温和，耐心，目标。",
-      "reversed": "不平衡，过度，重新调整，失调。"
-    }
+      "upright": "寻求平衡, 保持耐心, 促进合作。",
+      "reversed": "行为过度, 失去平衡, 内部冲突。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/b4a589b520ec09914ff0cff2dedac3cf298252208.png@922w_1634h.avif"
   },
   {
     "id": 15,
     "name": "恶魔 (The Devil)",
     "description": {
-      "upright": "束缚，成瘾，物质主义，游戏。",
-      "reversed": "打破束缚，独立，重新获得控制。"
-    }
+      "upright": "沉迷欲望, 物质束缚, 感到无力。",
+      "reversed": "打破束缚, 寻求自由, 恢复控制。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/a7736b20fd2957c79da81504d803e010298252208.png@922w_1634h.avif"
   },
   {
     "id": 16,
     "name": "塔 (The Tower)",
     "description": {
-      "upright": "突变，剧变，混乱，启示。",
-      "reversed": "避免灾难，害怕改变。"
-    }
+      "upright": "突发剧变, 接受启示, 推倒重建。",
+      "reversed": "逃避灾难, 恐惧改变, 危机延后。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/46a91a6d8f14c5a073b5a2642af04122298252208.png@922w_1634h.avif"
   },
   {
     "id": 17,
     "name": "星星 (The Star)",
     "description": {
-      "upright": "希望，信念，目标，更新，灵性。",
-      "reversed": "缺乏信念，绝望，迷失方向。"
-    }
+      "upright": "充满希望, 获得治愈, 保持信念。",
+      "reversed": "感到绝望, 缺乏信念, 迷失方向。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/1f99582179e7a56987fe2eca7efcfae1298252208.png@922w_1634h.avif"
   },
   {
     "id": 18,
     "name": "月亮 (The Moon)",
     "description": {
-      "upright": "幻觉，恐惧，焦虑，潜意识，直觉。",
-      "reversed": "释放恐惧，压抑的情感，内心的困惑。"
-    }
+      "upright": "充满幻想, 感到不安, 释放恐惧。",
+      "reversed": "困惑解除, 释放压抑, 面对现实。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/967f7b6292b860ea278eb0c1d4e1514c298252208.png@922w_1634h.avif"
   },
   {
     "id": 19,
     "name": "太阳 (The Sun)",
     "description": {
-      "upright": "积极，乐趣，温暖，成功，活力。",
-      "reversed": "内心的孩子，过于乐观，压抑的能量。"
-    }
+      "upright": "充满喜悦, 获得成功, 保持活力。",
+      "reversed": "过度乐观, 热情消退, 目标不清。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/ac4cee56f7815eaf2a26bef2d01515c7298252208.png@922w_1634h.avif"
   },
   {
     "id": 20,
     "name": "审判 (Judgement)",
     "description": {
-      "upright": "审判，重生，内心的呼唤，赦免。",
-      "reversed": "自我怀疑，无视呼唤，内在的批评。"
-    }
+      "upright": "自我反省, 获得宽恕, 迎接新生。",
+      "reversed": "自我怀疑, 逃避现实, 害怕评判。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/99b1d30ce702a6d07b86538886cd5442298252208.png@922w_1634h.avif"
   },
   {
     "id": 21,
     "name": "世界 (The World)",
     "description": {
-      "upright": "完成，整合，成就，旅行。",
-      "reversed": "寻求个人的结束，捷径，延迟。"
-    }
+      "upright": "功德圆满, 达成目标, 享受成功。",
+      "reversed": "停滞不前, 逃避结束, 缺乏整合。"
+    },
+    "image": "https://i2.hdslb.com/bfs/article/f9e2f7389d4d444fd62314151644fc0f298252208.png@922w_1634h.avif"
   }
-] 
+]

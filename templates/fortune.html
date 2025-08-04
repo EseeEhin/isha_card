@@ -90,10 +90,33 @@
             resize: vertical;
             min-height: 100px;
         }
-        textarea:focus {
+        textarea:focus, input[type="text"]:focus {
             outline: none;
             border-color: #f39c12;
             box-shadow: 0 0 5px rgba(243, 156, 18, 0.3);
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+        }
+        .image-preview-container {
+            margin-top: 10px;
+            text-align: center;
+        }
+        .image-preview {
+            max-width: 150px;
+            max-height: 150px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f0f0f0;
+            object-fit: contain;
+            display: none; /* Initially hidden */
+        }
+        .image-preview.visible {
+            display: inline-block;
         }
         .save-btn {
             background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
@@ -122,7 +145,7 @@
         <h1>✨ 管理运势</h1>
         <a href="{{ url_for('index') }}" class="back-link">← 返回主页</a>
         
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             <div class="fortune-container">
                 {% for item in fortunes %}
                 <div class="fortune-item">
@@ -139,6 +162,14 @@
                     </div>
                     
                     <div class="form-group">
+                        <label for="image_upload_{{ item.id }}">上传新运势图片 (会覆盖旧图片):</label>
+                        <input type="file" name="image_upload_{{ item.id }}" id="image_upload_{{ item.id }}" accept="image/*" onchange="updatePreview('{{ item.id }}')">
+                        <div class="image-preview-container">
+                            <img id="preview_{{ item.id }}" src="{{ url_for('static', filename=item.image.split('static/')[1]) if item.image and 'static' in item.image else item.image }}" class="image-preview {{ 'visible' if item.image else '' }}" alt="图片预览">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
                         <label for="description_{{ item.id }}">运势解读:</label>
                         <textarea name="description_{{ item.id }}" id="description_{{ item.id }}">{{ item.description }}</textarea>
                     </div>
@@ -151,5 +182,37 @@
             </div>
         </form>
     </div>
+
+    <script>
+        function updatePreview(itemId) {
+            const input = document.getElementById(`image_upload_${itemId}`);
+            const preview = document.getElementById(`preview_${itemId}`);
+            const file = input.files[0];
+
+            if (file) {
+                preview.src = URL.createObjectURL(file);
+                preview.classList.add('visible');
+                preview.onload = () => {
+                    URL.revokeObjectURL(preview.src); // free memory
+                }
+            }
+        }
+
+        // Ensure existing images are displayed correctly on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const previews = document.querySelectorAll('.image-preview');
+            previews.forEach(preview => {
+                // Hide broken images
+                preview.onerror = function() {
+                    this.style.display = 'none';
+                };
+                if (preview.src && preview.src.includes('static')) {
+                     preview.classList.add('visible');
+                } else if (!preview.src) {
+                    preview.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
-</html> 
+</html>

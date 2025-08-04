@@ -77,10 +77,33 @@
             resize: vertical;
             min-height: 80px;
         }
-        textarea:focus {
+        textarea:focus, input[type="text"]:focus {
             outline: none;
             border-color: #3498db;
             box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+        }
+        .image-preview-container {
+            margin-top: 10px;
+            text-align: center;
+        }
+        .image-preview {
+            max-width: 150px;
+            max-height: 250px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f0f0f0;
+            object-fit: contain;
+            display: none; /* Initially hidden */
+        }
+        .image-preview.visible {
+            display: inline-block;
         }
         .save-btn {
             background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
@@ -109,7 +132,7 @@
         <h1>🎴 管理塔罗牌</h1>
         <a href="{{ url_for('index') }}" class="back-link">← 返回主页</a>
         
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             <div class="card-container">
                 {% for card in tarot_cards %}
                 <div class="card-item">
@@ -118,6 +141,14 @@
                     <div class="form-group">
                         <label for="upright_{{ card.id }}">正位 (Upright):</label>
                         <textarea name="upright_{{ card.id }}" id="upright_{{ card.id }}">{{ card.description.upright }}</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="image_upload_{{ card.id }}">上传新卡面 (会覆盖旧图片):</label>
+                        <input type="file" name="image_upload_{{ card.id }}" id="image_upload_{{ card.id }}" accept="image/*" onchange="updatePreview('{{ card.id }}')">
+                        <div class="image-preview-container">
+                            <img id="preview_{{ card.id }}" src="{{ url_for('static', filename=card.image.split('static/')[1]) if card.image and 'static' in card.image else card.image }}" class="image-preview {{ 'visible' if card.image else '' }}" alt="图片预览">
+                        </div>
                     </div>
                     
                     <div class="form-group">
@@ -133,5 +164,37 @@
             </div>
         </form>
     </div>
+
+    <script>
+        function updatePreview(cardId) {
+            const input = document.getElementById(`image_upload_${cardId}`);
+            const preview = document.getElementById(`preview_${cardId}`);
+            const file = input.files[0];
+
+            if (file) {
+                preview.src = URL.createObjectURL(file);
+                preview.classList.add('visible');
+                preview.onload = () => {
+                    URL.revokeObjectURL(preview.src); // free memory
+                }
+            }
+        }
+
+        // Ensure existing images are displayed correctly on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const previews = document.querySelectorAll('.image-preview');
+            previews.forEach(preview => {
+                // Hide broken images
+                preview.onerror = function() {
+                    this.style.display = 'none';
+                };
+                if (preview.src && preview.src.includes('static')) {
+                     preview.classList.add('visible');
+                } else if (!preview.src) {
+                    preview.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
-</html> 
+</html>

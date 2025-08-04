@@ -3,30 +3,35 @@
     "id": 1,
     "rating": 5,
     "fortune": "大吉",
-    "description": "今天万事如意！财运、事业运、桃花运都将达到顶峰，请尽情享受这美好的一天吧！"
+    "description": "万事如意, 好运连连, 尽情享受。",
+    "image": ""
   },
   {
     "id": 2,
     "rating": 4,
     "fortune": "吉",
-    "description": "今天会是顺利的一天。可能会有一些意想不到的小惊喜发生，请保持积极的心态。"
+    "description": "偶有惊喜, 保持乐观, 一切顺利。",
+    "image": ""
   },
   {
     "id": 3,
     "rating": 3,
     "fortune": "中平",
-    "description": "普普通通的一天。没有太多波澜，适合按部就班地完成计划中的事情。"
+    "description": "波澜不惊, 按部就班, 平淡是福。",
+    "image": ""
   },
   {
     "id": 4,
     "rating": 2,
     "fortune": "小凶",
-    "description": "今天可能会遇到一些小麻烦，但别担心，只要冷静处理，很快就能解决。"
+    "description": "偶有麻烦, 保持冷静, 小心应对。",
+    "image": ""
   },
   {
     "id": 5,
     "rating": 1,
     "fortune": "大凶",
-    "description": "今天不太顺利，建议谨言慎行，避免做出重大决定。宜静不宜动。"
+    "description": "诸事不顺, 谨言慎行, 宜静不宜动。",
+    "image": ""
   }
-] 
+]
