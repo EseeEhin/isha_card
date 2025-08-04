@@ -120,20 +120,46 @@ async def fortune(interaction: discord.Interaction):
 
         chosen_fortune = random.choice(fortunes)
         
-        rating_stars = "★" * chosen_fortune["rating"] + "☆" * (5 - chosen_fortune["rating"])
-        
+        # 根据运势等级决定颜色
+        if "吉" in chosen_fortune["level"] or "高照" in chosen_fortune["level"]:
+            color = discord.Color.gold()
+        elif "厄" in chosen_fortune["level"] or "笼罩" in chosen_fortune["level"]:
+            color = discord.Color.dark_purple()
+        else:
+            color = discord.Color.light_grey()
+
+        # 星星系统
+        star_icons = {'heart': '❤️', 'coin': '💰', 'star': '✨', 'thorn': '🥀', 'skull': '💀'}
+        star_symbol = star_icons.get(chosen_fortune.get("star_shape", "star"), '✨')
+        stars_display = star_symbol * chosen_fortune["stars"] + '🖤' * (7 - chosen_fortune["stars"])
+
         embed = discord.Embed(
-            title="✨ 今日运势 ✨",
-            description=f"你抽到了 **{chosen_fortune['fortune']}**！",
-            color=discord.Color.gold()
+            title=f"血族猫娘的今日占卜",
+            description=f"喵~ {interaction.user.mention}，来看看你的今日运势吧！",
+            color=color
         )
-        embed.add_field(name="运势等级", value=rating_stars, inline=False)
-        embed.add_field(name="运势解读", value=chosen_fortune["description"], inline=False)
         
-        if chosen_fortune.get("image"):
-            embed.set_image(url=chosen_fortune["image"])
+        embed.add_field(name="今日运势", value=f"**{chosen_fortune['level']}**", inline=False)
+        embed.add_field(name="幸运星", value=stars_display, inline=False)
+        
+        if chosen_fortune.get("tags"):
+            tags = " | ".join([f"`{tag}`" for tag in chosen_fortune["tags"]])
+            embed.add_field(name="运势标签", value=tags, inline=False)
             
-        embed.set_footer(text=f"由 {bot.user.name} 提供给 {interaction.user.name}")
+        embed.add_field(name="血族猫娘的低语", value=chosen_fortune["description"], inline=False)
+        
+        # 优先使用本地图片
+        image_path = chosen_fortune.get("image")
+        if image_path and os.path.exists(image_path):
+            # 为了在Discord中显示，需要一个URL。我们将通过Flask提供这个URL。
+            # 假设图片在 static/uploads/ 目录下
+            image_filename = os.path.basename(image_path)
+            # 注意：这里需要你的Flask应用有一个可访问的外部URL
+            base_url = os.getenv("BASE_URL", "http://localhost:7860") 
+            image_url = f"{base_url}/static/uploads/{image_filename}"
+            embed.set_image(url=image_url)
+        
+        embed.set_footer(text=f"来自暗影与月光下的祝福 | {bot.user.name}")
         
         await interaction.response.send_message(embed=embed)
     except Exception as e:
@@ -256,8 +282,8 @@ async def update_fortune_image(interaction: discord.Interaction, fortune_id: int
 async def fortune_autocomplete(interaction: discord.Interaction, current: str) -> list[app_commands.Choice[int]]:
     fortunes = bot.load_data(bot.fortune_file)
     choices = [
-        app_commands.Choice(name=f"({item['rating']}★) {item['fortune']}", value=item['id'])
-        for item in fortunes if current.lower() in item['fortune'].lower()
+        app_commands.Choice(name=f"({item['stars']}★) {item['level']}", value=item['id'])
+        for item in fortunes if current.lower() in item['level'].lower()
     ]
     return choices[:25]
 
@@ -321,16 +347,40 @@ async def test_draw_fortune(interaction: discord.Interaction, fortune_id: int):
             await interaction.response.send_message("错误：找不到指定的运势。", ephemeral=True)
             return
         
-        rating_stars = "★" * chosen_fortune["rating"] + "☆" * (5 - chosen_fortune["rating"])
+        # 复用主指令的逻辑来构建测试Embed
+        if "吉" in chosen_fortune["level"] or "高照" in chosen_fortune["level"]:
+            color = discord.Color.gold()
+        elif "厄" in chosen_fortune["level"] or "笼罩" in chosen_fortune["level"]:
+            color = discord.Color.dark_purple()
+        else:
+            color = discord.Color.light_grey()
+
+        star_icons = {'heart': '❤️', 'coin': '💰', 'star': '✨', 'thorn': '🥀', 'skull': '💀'}
+        star_symbol = star_icons.get(chosen_fortune.get("star_shape", "star"), '✨')
+        stars_display = star_symbol * chosen_fortune["stars"] + '🖤' * (7 - chosen_fortune["stars"])
+
         embed = discord.Embed(
-            title="✨【测试】今日运势 ✨",
-            description=f"你抽到了 **{chosen_fortune['fortune']}**！",
-            color=discord.Color.blue()
+            title=f"【测试】血族猫娘的今日占卜",
+            description=f"喵~ {interaction.user.mention}，这是你的测试运势！",
+            color=color
         )
-        embed.add_field(name="运势等级", value=rating_stars, inline=False)
-        embed.add_field(name="运势解读", value=chosen_fortune["description"], inline=False)
-        if chosen_fortune.get("image"):
-            embed.set_image(url=chosen_fortune["image"])
+        
+        embed.add_field(name="今日运势", value=f"**{chosen_fortune['level']}**", inline=False)
+        embed.add_field(name="幸运星", value=stars_display, inline=False)
+        
+        if chosen_fortune.get("tags"):
+            tags = " | ".join([f"`{tag}`" for tag in chosen_fortune["tags"]])
+            embed.add_field(name="运势标签", value=tags, inline=False)
+            
+        embed.add_field(name="血族猫娘的低语", value=chosen_fortune["description"], inline=False)
+        
+        image_path = chosen_fortune.get("image")
+        if image_path and os.path.exists(image_path):
+            image_filename = os.path.basename(image_path)
+            base_url = os.getenv("BASE_URL", "http://localhost:7860") 
+            image_url = f"{base_url}/static/uploads/{image_filename}"
+            embed.set_image(url=image_url)
+        
         embed.set_footer(text=f"测试指令由 {interaction.user.name} 执行")
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -391,24 +441,44 @@ def fortune_web():
     try:
         fortunes = bot.load_data(bot.fortune_file)
         if request.method == 'POST':
-            for item in fortunes:
-                # 处理文本更新
-                new_description = request.form.get(f'description_{item["id"]}')
-                if new_description is not None:
-                    item['description'] = new_description
+            updated_fortunes = []
+            # 使用索引来处理表单提交，因为ID可能不是连续的
+            for i in range(len(fortunes)):
+                item_id = int(request.form.get(f'id_{i}'))
+                item = next((f for f in fortunes if f['id'] == item_id), None)
+                if not item:
+                    continue
+
+                item['level'] = request.form.get(f'level_{item_id}', item['level'])
+                tags_str = request.form.get(f'tags_{item_id}', '')
+                item['tags'] = [tag.strip() for tag in tags_str.split(',') if tag.strip()]
+                item['stars'] = int(request.form.get(f'stars_{item_id}', item['stars']))
+                item['star_shape'] = request.form.get(f'star_shape_{item_id}', item['star_shape'])
+                item['description'] = request.form.get(f'description_{item_id}', item['description'])
 
                 # 处理文件上传
-                file_key = f'image_upload_{item["id"]}'
+                file_key = f'image_upload_{item_id}'
                 if file_key in request.files:
                     file = request.files[file_key]
                     if file and file.filename and allowed_file(file.filename):
-                        filename = secure_filename(f"fortune_{item['id']}_{file.filename}")
+                        # 使用 item_id 确保文件名唯一性
+                        filename = secure_filename(f"fortune_bg_{item_id}{os.path.splitext(file.filename)[1]}")
                         save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                         file.save(save_path)
-                        item['image'] = f"/{save_path.replace(os.path.sep, '/')}"
+                        # 保存相对路径以便于机器人内部使用
+                        item['image'] = os.path.join(UPLOAD_FOLDER, filename).replace(os.path.sep, '/')
+                
+                updated_fortunes.append(item)
 
-            bot.save_data(bot.fortune_file, fortunes)
+            # 确保所有原始数据都被处理
+            existing_ids = {f['id'] for f in updated_fortunes}
+            for f in fortunes:
+                if f['id'] not in existing_ids:
+                    updated_fortunes.append(f)
+
+            bot.save_data(bot.fortune_file, updated_fortunes)
             return redirect(url_for('fortune_web'))
+            
         return render_template('fortune.html', fortunes=fortunes)
     except Exception as e:
         logger.error(f"Error in fortune_web: {e}")

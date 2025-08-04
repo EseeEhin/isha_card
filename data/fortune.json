@@ -1,37 +1,47 @@
 [
   {
     "id": 1,
-    "rating": 5,
-    "fortune": "大吉",
-    "description": "万事如意, 好运连连, 尽情享受。",
-    "image": ""
+    "level": "辉耀大吉",
+    "tags": ["姻缘", "邂逅", "魅力"],
+    "stars": 7,
+    "star_shape": "heart",
+    "description": "喵~今天你的魅力无人能挡，就像黑夜里最亮的星辰。空气中弥漫着甜美的血腥味……啊不，是爱情的芬芳。敞开心扉，迎接一场浪漫的邂逅吧，我的小猎物。",
+    "image": "static/uploads/fortune_bg_good.jpg"
   },
   {
     "id": 2,
-    "rating": 4,
-    "fortune": "吉",
-    "description": "偶有惊喜, 保持乐观, 一切顺利。",
-    "image": ""
+    "level": "幸运高照",
+    "tags": ["事业", "机遇", "财富"],
+    "stars": 6,
+    "star_shape": "coin",
+    "description": "哼哼，闻到金钱的味道了吗？今天的你就像抓到了最肥美的老鼠，财运亨通。保持敏锐的直觉，抓住那个一闪而过的机会，宝藏就在眼前了哦。",
+    "image": "static/uploads/fortune_bg_good.jpg"
   },
   {
     "id": 3,
-    "rating": 3,
-    "fortune": "中平",
-    "description": "波澜不惊, 按部就班, 平淡是福。",
-    "image": ""
+    "level": "平和之日",
+    "tags": ["日常", "安稳", "小憩"],
+    "stars": 4,
+    "star_shape": "star",
+    "description": "今天就像一个慵懒的午后，最适合找个舒服的角落打个盹。没什么大事发生，就让紧绷的神经放松一下吧。偶尔的平静，是为了下一次更好的狩猎，你懂的。",
+    "image": "static/uploads/fortune_bg_normal.jpg"
   },
   {
     "id": 4,
-    "rating": 2,
-    "fortune": "小凶",
-    "description": "偶有麻烦, 保持冷静, 小心应对。",
-    "image": ""
+    "level": "微光厄运",
+    "tags": ["波折", "挑战", "谨慎"],
+    "stars": 2,
+    "star_shape": "thorn",
+    "description": "喵呜…今天的路有点不平坦呢，像是有讨厌的荆棘挡路。不过别担心，只是一些小麻烦。收起你的爪子，小心翼翼地绕过去就好，可别被扎到了。",
+    "image": "static/uploads/fortune_bg_bad.jpg"
   },
   {
     "id": 5,
-    "rating": 1,
-    "fortune": "大凶",
-    "description": "诸事不顺, 谨言慎行, 宜静不宜动。",
-    "image": ""
+    "level": "暗影笼罩",
+    "tags": ["失落", "阻碍", "蛰伏"],
+    "stars": 1,
+    "star_shape": "skull",
+    "description": "嘘…今天不适合外出捕猎。空气中充满了危险的气息，最好躲在自己的城堡里。记住，暂时的蛰伏不是软弱，是为了在下一个月圆之夜，展现更强大的力量。",
+    "image": "static/uploads/fortune_bg_bad.jpg"
   }
 ]

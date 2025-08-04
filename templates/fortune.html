@@ -3,104 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理运势 - Discord 抽卡机器人</title>
+    <title>管理运势 - 血族猫娘占卜屋</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
         }
         .container {
-            background: white;
+            background: #162447;
             padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+            border: 1px solid #1f4068;
         }
         h1 {
-            color: #2c3e50;
+            color: #e43f5a;
             text-align: center;
             margin-bottom: 30px;
+            font-family: 'Georgia', serif;
+            text-shadow: 0 0 10px #e43f5a;
         }
         .back-link {
             display: inline-block;
             margin-bottom: 20px;
             padding: 10px 20px;
-            background: #3498db;
+            background: #e43f5a;
             color: white;
             text-decoration: none;
             border-radius: 5px;
-            transition: background 0.2s;
+            transition: background 0.3s, transform 0.2s;
         }
         .back-link:hover {
-            background: #2980b9;
+            background: #b83248;
+            transform: translateY(-2px);
         }
         .fortune-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
             margin-top: 20px;
         }
         .fortune-item {
-            border: 2px solid #e0e0e0;
+            border: 2px solid #1f4068;
             border-radius: 10px;
             padding: 20px;
-            background: #fafafa;
-            transition: border-color 0.2s;
+            background: #1b1b2f;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
         .fortune-item:hover {
-            border-color: #f39c12;
-        }
-        .fortune-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .fortune-name {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        .fortune-rating {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .star {
-            color: #f39c12;
-            font-size: 1.2em;
+            border-color: #e43f5a;
+            box-shadow: 0 0 15px rgba(228, 63, 90, 0.5);
         }
         .form-group {
             margin-bottom: 15px;
         }
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: bold;
-            color: #555;
+            color: #a0a0e0;
+        }
+        input[type="text"], input[type="number"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #1f4068;
+            border-radius: 5px;
+            font-family: inherit;
+            background-color: #162447;
+            color: #e0e0e0;
+            box-sizing: border-box;
         }
         textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-family: inherit;
             resize: vertical;
-            min-height: 100px;
+            min-height: 120px;
         }
-        textarea:focus, input[type="text"]:focus {
+        input:focus, textarea:focus, select:focus {
             outline: none;
-            border-color: #f39c12;
-            box-shadow: 0 0 5px rgba(243, 156, 18, 0.3);
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-family: inherit;
+            border-color: #e43f5a;
+            box-shadow: 0 0 8px rgba(228, 63, 90, 0.4);
         }
         .image-preview-container {
             margin-top: 10px;
@@ -109,69 +93,86 @@
         .image-preview {
             max-width: 150px;
             max-height: 150px;
-            border: 1px solid #ddd;
+            border: 1px solid #1f4068;
             border-radius: 8px;
-            background-color: #f0f0f0;
+            background-color: #1a1a2e;
             object-fit: contain;
-            display: none; /* Initially hidden */
+            display: none;
         }
         .image-preview.visible {
             display: inline-block;
         }
         .save-btn {
-            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            background: linear-gradient(135deg, #e43f5a 0%, #b83248 100%);
             color: white;
             border: none;
             padding: 15px 30px;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.3s;
             margin-top: 20px;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
         }
         .save-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(228, 63, 90, 0.4);
         }
         .save-container {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 40px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>✨ 管理运势</h1>
+        <h1>🌙 管理运势</h1>
         <a href="{{ url_for('index') }}" class="back-link">← 返回主页</a>
         
         <form method="post" enctype="multipart/form-data">
             <div class="fortune-container">
                 {% for item in fortunes %}
                 <div class="fortune-item">
-                    <div class="fortune-header">
-                        <div class="fortune-name">{{ item.fortune }}</div>
-                        <div class="fortune-rating">
-                            {% for i in range(item.rating) %}
-                            <span class="star">★</span>
-                            {% endfor %}
-                            {% for i in range(5 - item.rating) %}
-                            <span class="star">☆</span>
-                            {% endfor %}
-                        </div>
-                    </div>
+                    <input type="hidden" name="id_{{ loop.index0 }}" value="{{ item.id }}">
                     
                     <div class="form-group">
-                        <label for="image_upload_{{ item.id }}">上传新运势图片 (会覆盖旧图片):</label>
-                        <input type="file" name="image_upload_{{ item.id }}" id="image_upload_{{ item.id }}" accept="image/*" onchange="updatePreview('{{ item.id }}')">
-                        <div class="image-preview-container">
-                            <img id="preview_{{ item.id }}" src="{{ url_for('static', filename=item.image.split('static/')[1]) if item.image and 'static' in item.image else item.image }}" class="image-preview {{ 'visible' if item.image else '' }}" alt="图片预览">
-                        </div>
+                        <label for="level_{{ item.id }}">运势等级:</label>
+                        <input type="text" name="level_{{ item.id }}" id="level_{{ item.id }}" value="{{ item.level }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tags_{{ item.id }}">运势标签 (用逗号分隔):</label>
+                        <input type="text" name="tags_{{ item.id }}" id="tags_{{ item.id }}" value="{{ item.tags | join(', ') }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stars_{{ item.id }}">星星数量 (1-7):</label>
+                        <input type="number" name="stars_{{ item.id }}" id="stars_{{ item.id }}" value="{{ item.stars }}" min="1" max="7">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="star_shape_{{ item.id }}">星星形状:</label>
+                        <select name="star_shape_{{ item.id }}" id="star_shape_{{ item.id }}">
+                            <option value="star" {% if item.star_shape == 'star' %}selected{% endif %}>普通 ✨</option>
+                            <option value="heart" {% if item.star_shape == 'heart' %}selected{% endif %}>爱心 ❤️</option>
+                            <option value="coin" {% if item.star_shape == 'coin' %}selected{% endif %}>金币 💰</option>
+                            <option value="thorn" {% if item.star_shape == 'thorn' %}selected{% endif %}>荆棘 🥀</option>
+                            <option value="skull" {% if item.star_shape == 'skull' %}selected{% endif %}>骷髅 💀</option>
+                        </select>
                     </div>
                     
                     <div class="form-group">
                         <label for="description_{{ item.id }}">运势解读:</label>
                         <textarea name="description_{{ item.id }}" id="description_{{ item.id }}">{{ item.description }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="image_upload_{{ item.id }}">上传新背景图片 (会覆盖旧图片):</label>
+                        <input type="file" name="image_upload_{{ item.id }}" id="image_upload_{{ item.id }}" accept="image/*" onchange="updatePreview('{{ item.id }}')">
+                        <div class="image-preview-container">
+                            <img id="preview_{{ item.id }}" src="{{ item.image if item.image else '' }}" class="image-preview {{ 'visible' if item.image else '' }}" alt="图片预览">
+                        </div>
                     </div>
                 </div>
                 {% endfor %}
@@ -198,18 +199,16 @@
             }
         }
 
-        // Ensure existing images are displayed correctly on load
         document.addEventListener('DOMContentLoaded', function() {
             const previews = document.querySelectorAll('.image-preview');
             previews.forEach(preview => {
-                // Hide broken images
                 preview.onerror = function() {
                     this.style.display = 'none';
                 };
-                if (preview.src && preview.src.includes('static')) {
-                     preview.classList.add('visible');
-                } else if (!preview.src) {
+                if (!preview.src || preview.src.endsWith('/')) {
                     preview.style.display = 'none';
+                } else {
+                    preview.classList.add('visible');
                 }
             });
         });
