@@ -14,6 +14,8 @@ from werkzeug.utils import secure_filename
 from PIL import Image, ImageDraw, ImageFont
 import io
 import textwrap
+import requests
+import hashlib
 
 # 设置日志
 logging.basicConfig(level=logging.INFO)
@@ -116,8 +118,28 @@ def generate_fortune_card(level, tags, text, image_path):
             font_regular = ImageFont.load_default()
             font_small = ImageFont.load_default()
 
-        # 打开背景图
-        bg_image = Image.open(image_path).convert("RGBA")
+        # --- 图片缓存逻辑 ---
+        cache_dir = os.path.join('static', 'image_cache')
+        os.makedirs(cache_dir, exist_ok=True)
+        
+        local_image_path = image_path
+        if image_path.startswith('http'):
+            # 根据URL生成一个安全的文件名
+            url_hash = hashlib.sha1(image_path.encode()).hexdigest()
+            file_extension = os.path.splitext(image_path.split('?')[0])[-1] or '.png' # 保留原始扩展名
+            cached_filename = f"{url_hash}{file_extension}"
+            local_image_path = os.path.join(cache_dir, cached_filename)
+
+            # 如果缓存文件不存在，则下载
+            if not os.path.exists(local_image_path):
+                response = requests.get(image_path, stream=True)
+                response.raise_for_status()
+                with open(local_image_path, 'wb') as f:
+                    for chunk in response.iter_content(1024):
+                        f.write(chunk)
+        
+        # 打开背景图 (无论是本地路径还是缓存路径)
+        bg_image = Image.open(local_image_path).convert("RGBA")
         # 创建一个半透明的黑色遮罩
         overlay = Image.new("RGBA", bg_image.size, (0, 0, 0, 80))
         # 将遮罩叠加到背景图上
@@ -188,39 +210,30 @@ async def fortune(interaction: discord.Interaction):
         if stars >= 5: luck_type = "good"
         elif stars <= 2: luck_type = "bad"
 
-        # 3. 模块化抽取标签和文本
+        # 3. 模块化抽取标签和文本（新逻辑）
         selected_tag_objects = []
+        total_tags = random.randint(1, 5)
+
+        # 首先，根据运势类型选择一个基础标签
+        base_pool = []
+        if luck_type == "good":
+            base_pool = good_pool
+        elif luck_type == "bad":
+            base_pool = bad_pool
+        else: # neutral
+            base_pool = neutral_pool
         
-        # 保底抽取
-        if luck_type == "good" and good_pool:
-            selected_tag_objects.append(random.choice(good_pool))
-        elif luck_type == "bad" and bad_pool:
-            selected_tag_objects.append(random.choice(bad_pool))
-        elif neutral_pool: # 中性运或吉/厄池为空时的保底
-            selected_tag_objects.append(random.choice(neutral_pool))
+        if base_pool:
+            selected_tag_objects.append(random.choice(base_pool))
 
-        # 根据运气类型，决定额外抽取的中性标签数量（最多可使总数达到5个）
-        num_additional_tags = 0
-        if neutral_pool: # 只有中性池不为空时才可能额外抽取
-            if luck_type == "neutral":
-                # 中性运气，额外抽 0-4 个 (总数 1-5)
-                # 需要确保不会超出池子大小
-                max_extra = min(4, len(neutral_pool) - 1)
-                if max_extra >= 0:
-                    num_additional_tags = random.randint(0, max_extra)
-            else:
-                # 吉/厄运，额外抽 0-4 个 (总数 1-5)
-                max_extra = min(4, len(neutral_pool))
-                if max_extra >= 0:
-                    num_additional_tags = random.randint(0, max_extra)
-
-        if num_additional_tags > 0:
-            # 获取已经选择的标签的id，避免重复
+        # 然后，抽取额外的中性标签，直到达到目标数量
+        num_additional_tags = total_tags - len(selected_tag_objects)
+        if num_additional_tags > 0 and neutral_pool:
             existing_ids = {t['id'] for t in selected_tag_objects}
-            # 筛选出中性池中可以抽取的标签
+            # 筛选出可用的中性标签
             drawable_neutral_pool = [t for t in neutral_pool if t['id'] not in existing_ids]
             
-            # 确保抽取的数量不超过可抽取的数量
+            # 确保抽取的数量不超过可用标签的数量
             num_to_draw = min(num_additional_tags, len(drawable_neutral_pool))
 
             if num_to_draw > 0:
@@ -279,8 +292,8 @@ async def fortune(interaction: discord.Interaction):
         image_path = chosen_level.get("image")
         generated_card_file = None
 
-        # 确保有图片路径才尝试生成
-        if image_path and os.path.exists(image_path):
+        # 尝试生成图片，如果 image_path 存在
+        if image_path:
             generated_card_file = generate_fortune_card(chosen_level, tags_to_display, final_text, image_path)
 
         if generated_card_file:
