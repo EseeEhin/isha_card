@@ -1,49 +1,207 @@
 {
   "tag_pools": {
     "good": [
-      { "id": 1, "tag": "天降横财", "text": "你的财运爆棚，钱包鼓鼓囊囊，" },
-      { "id": 2, "tag": "桃花朵朵", "text": "浪漫的邂逅即将发生，" },
-      { "id": 3, "tag": "事业高升", "text": "工作上的努力将得到回报，" },
-      { "id": 4, "tag": "贵人相助", "text": "会有人在关键时刻帮你一把，" },
-      { "id": 5, "tag": "灵感爆发", "text": "创造力如泉涌，" },
-      { "id": 6, "tag": "心想事成", "text": "你心里想的事情会顺利实现，" },
-      { "id": 7, "tag": "学业有成", "text": "今天的学习效率特别高，" },
-      { "id": 8, "tag": "活力满满", "text": "今天精力充沛，做什么都带劲，" },
-      { "id": 9, "tag": "好事将近", "text": "期待已久的好消息马上就到，" },
-      { "id": 10, "tag": "一帆风顺", "text": "所有计划都将顺利进行，" }
+      {
+        "id": 1,
+        "tag": "天降横财",
+        "text": "你的财运爆棚，钱包鼓鼓囊囊，"
+      },
+      {
+        "id": 2,
+        "tag": "桃花朵朵",
+        "text": "浪漫的邂逅即将发生，"
+      },
+      {
+        "id": 3,
+        "tag": "事业高升",
+        "text": "工作上的努力将得到回报，"
+      },
+      {
+        "id": 4,
+        "tag": "贵人相助",
+        "text": "会有人在关键时刻帮你一把，"
+      },
+      {
+        "id": 5,
+        "tag": "灵感爆发",
+        "text": "创造力如泉涌，"
+      },
+      {
+        "id": 6,
+        "tag": "心想事成",
+        "text": "你心里想的事情会顺利实现，"
+      },
+      {
+        "id": 7,
+        "tag": "学业有成",
+        "text": "今天的学习效率特别高，"
+      },
+      {
+        "id": 8,
+        "tag": "活力满满",
+        "text": "今天精力充沛，做什么都带劲，"
+      },
+      {
+        "id": 9,
+        "tag": "好事将近",
+        "text": "期待已久的好消息马上就到，"
+      },
+      {
+        "id": 10,
+        "tag": "一帆风顺",
+        "text": "所有计划都将顺利进行，"
+      }
     ],
     "bad": [
-      { "id": 1, "tag": "小人作祟", "text": "注意身边可能会有不和谐的声音，" },
-      { "id": 2, "tag": "破财消灾", "text": "可能会有意外的支出，" },
-      { "id": 3, "tag": "诸事不顺", "text": "今天做事可能会遇到一些阻碍，" },
-      { "id": 4, "tag": "水逆退散", "text": "感觉有点混乱，最好检查一下日程安排，" },
-      { "id": 5, "tag": "心烦意乱", "text": "内心有些焦躁不安，" },
-      { "id": 6, "tag": "无妄之灾", "text": "可能会被卷入意想不到的麻烦里，" },
-      { "id": 7, "tag": "容易犯困", "text": "今天可能会觉得有点疲惫，" },
-      { "id": 8, "tag": "沟通不畅", "text": "与人交流时可能会有误会，" },
-      { "id": 9, "tag": "计划赶不上变化", "text": "原定的计划可能会被打乱，" }
+      {
+        "id": 1,
+        "tag": "小人作祟",
+        "text": "注意身边可能会有不和谐的声音，"
+      },
+      {
+        "id": 2,
+        "tag": "破财消灾",
+        "text": "可能会有意外的支出，"
+      },
+      {
+        "id": 3,
+        "tag": "诸事不顺",
+        "text": "今天做事可能会遇到一些阻碍，"
+      },
+      {
+        "id": 4,
+        "tag": "水逆退散",
+        "text": "感觉有点混乱，最好检查一下日程安排，"
+      },
+      {
+        "id": 5,
+        "tag": "心烦意乱",
+        "text": "内心有些焦躁不安，"
+      },
+      {
+        "id": 6,
+        "tag": "无妄之灾",
+        "text": "可能会被卷入意想不到的麻烦里，"
+      },
+      {
+        "id": 7,
+        "tag": "容易犯困",
+        "text": "今天可能会觉得有点疲惫，"
+      },
+      {
+        "id": 8,
+        "tag": "沟通不畅",
+        "text": "与人交流时可能会有误会，"
+      },
+      {
+        "id": 9,
+        "tag": "计划赶不上变化",
+        "text": "原定的计划可能会被打乱，"
+      }
     ],
     "neutral": [
-      { "id": 1, "tag": "平淡是福", "text": "今天会是平静祥和的一天。" },
-      { "id": 2, "tag": "保持健康", "text": "记得多喝水多运动。" },
-      { "id": 3, "tag": "宜室宜家", "text": "适合待在家里享受宁静时光。" },
-      { "id": 4, "tag": "静心思考", "text": "适合一个人静静地思考人生。" },
-      { "id": 5, "tag": "出门走走", "text": "可以出门散散心，呼吸新鲜空气。" },
-      { "id": 6, "tag": "人际和谐", "text": "与他人的交往会很顺利。" },
-      { "id": 7, "tag": "按部就班", "text": "按照计划行事就好。" },
-      { "id": 8, "tag": "宜听音乐", "text": "听听喜欢的音乐，放松一下心情。" },
-      { "id": 9, "tag": "整理房间", "text": "整理一下周围的环境，会有新的发现。" },
-      { "id": 10, "tag": "顺其自然", "text": "不必强求，顺其自然就好。" }
+      {
+        "id": 1,
+        "tag": "平淡是福",
+        "text": "今天会是平静祥和的一天。"
+      },
+      {
+        "id": 2,
+        "tag": "保持健康",
+        "text": "记得多喝水多运动。"
+      },
+      {
+        "id": 3,
+        "tag": "宜室宜家",
+        "text": "适合待在家里享受宁静时光。"
+      },
+      {
+        "id": 4,
+        "tag": "静心思考",
+        "text": "适合一个人静静地思考人生。"
+      },
+      {
+        "id": 5,
+        "tag": "出门走走",
+        "text": "可以出门散散心，呼吸新鲜空气。"
+      },
+      {
+        "id": 6,
+        "tag": "人际和谐",
+        "text": "与他人的交往会很顺利。"
+      },
+      {
+        "id": 7,
+        "tag": "按部就班",
+        "text": "按照计划行事就好。"
+      },
+      {
+        "id": 8,
+        "tag": "宜听音乐",
+        "text": "听听喜欢的音乐，放松一下心情。"
+      },
+      {
+        "id": 9,
+        "tag": "整理房间",
+        "text": "整理一下周围的环境，会有新的发现。"
+      },
+      {
+        "id": 10,
+        "tag": "顺其自然",
+        "text": "不必强求，顺其自然就好。"
+      }
     ]
   },
   "levels": [
-    { "id": 1, "level_name": "大吉", "stars": 7, "star_shape": "star", "image": "" },
-    { "id": 2, "level_name": "中吉", "stars": 6, "star_shape": "star", "image": "" },
-    { "id": 3, "level_name": "吉", "stars": 5, "star_shape": "star", "image": "" },
-    { "id": 4, "level_name": "小吉", "stars": 4, "star_shape": "star", "image": "" },
-    { "id": 5, "level_name": "末吉", "stars": 3, "star_shape": "thorn", "image": "" },
-    { "id": 6, "level_name": "小厄", "stars": 2, "star_shape": "thorn", "image": "" },
-    { "id": 7, "level_name": "大厄", "stars": 1, "star_shape": "skull", "image": "" }
+    {
+      "id": 1,
+      "level_name": "大吉",
+      "stars": 7,
+      "star_shape": "heart",
+      "image": "https://i2.hdslb.com/bfs/article/4602128a3a38f9f21132a84bcfcd452da49a85fb.jpg@1192w.avif"
+    },
+    {
+      "id": 2,
+      "level_name": "中吉",
+      "stars": 6,
+      "star_shape": "heart",
+      "image": "https://i2.hdslb.com/bfs/article/a63ed6caa464041a3c149a5956c237aadcf9bed0.jpg@1192w.avif"
+    },
+    {
+      "id": 3,
+      "level_name": "吉",
+      "stars": 5,
+      "star_shape": "star",
+      "image": "https://i2.hdslb.com/bfs/article/66215214adb3aa0c43d6da6d74ab119badaa3859.jpg@1192w.avif"
+    },
+    {
+      "id": 4,
+      "level_name": "小吉",
+      "stars": 4,
+      "star_shape": "star",
+      "image": "https://i2.hdslb.com/bfs/article/94a3f2ac6073d1abf43358bf836c74bebb3dd384.png@1192w.avif"
+    },
+    {
+      "id": 5,
+      "level_name": "末吉",
+      "stars": 3,
+      "star_shape": "thorn",
+      "image": "https://i2.hdslb.com/bfs/article/ea6604f3b9b1de99369ca10c222b9260c4b96f96.jpg@1192w.avif"
+    },
+    {
+      "id": 6,
+      "level_name": "小厄",
+      "stars": 2,
+      "star_shape": "thorn",
+      "image": "https://i2.hdslb.com/bfs/article/0e7c22ef1179bf969916b1e210454a79c0f7d374.jpg@1192w.avif"
+    },
+    {
+      "id": 7,
+      "level_name": "大厄",
+      "stars": 1,
+      "star_shape": "skull",
+      "image": "https://i2.hdslb.com/bfs/article/09bdc8409569b21e3c23ac974c6095e6a2fe28ec.jpg@1192w.avif"
+    }
   ],
   "connectors": {
     "intro": [
