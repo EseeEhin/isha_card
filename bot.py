@@ -165,8 +165,13 @@ async def fortune(interaction: discord.Interaction):
         text_fragments = [obj['text'] for obj in selected_tag_objects]
         
         connectors = fortune_data.get("connectors", {})
-        intro = connectors.get("intro", "")
-        outro = connectors.get(f"outro_{luck_type}", "")
+        
+        # 从列表中随机选择连接语
+        intro_options = connectors.get("intro", [""])
+        intro = random.choice(intro_options) if intro_options else ""
+
+        outro_options = connectors.get(f"outro_{luck_type}", [""])
+        outro = random.choice(outro_options) if outro_options else ""
         
         # 确保结尾标点符号正确
         final_text = intro + " " + "".join(text_fragments).strip().rstrip('，').rstrip('。').rstrip(',') + "。"
@@ -183,9 +188,29 @@ async def fortune(interaction: discord.Interaction):
         star_symbol = star_icons.get(chosen_level.get("star_shape", "star"), '✨')
         stars_display = star_symbol * stars + '🖤' * (7 - stars)
 
+        # 随机化 Embed 内容
+        titles = [
+            "血族猫娘的今日占卜",
+            "来自暗影与月光下的祝福",
+            "今日运势指引",
+            "喵~ 你的今日份好运！"
+        ]
+        descriptions = [
+            f"喵~ {interaction.user.mention}，来看看你的今日运势吧！",
+            f"你好呀，{interaction.user.mention}！这是给你的今日占卜。",
+            f"{interaction.user.mention}，月光为你洒下今天的启示。",
+            f"嗨，{interaction.user.mention}，看看今天有什么在等着你？"
+        ]
+        footers = [
+            f"来自暗影与月光下的祝福 | {bot.user.name}",
+            f"由 {bot.user.name} 为你占卜",
+            "愿星光指引你的道路",
+            "血族猫娘的神秘低语"
+        ]
+
         embed = discord.Embed(
-            title=f"血族猫娘的今日占卜",
-            description=f"喵~ {interaction.user.mention}，来看看你的今日运势吧！",
+            title=random.choice(titles),
+            description=random.choice(descriptions),
             color=color
         )
         
@@ -207,7 +232,7 @@ async def fortune(interaction: discord.Interaction):
                  image_url = f"{base_url}/{image_url}"
             embed.set_image(url=image_url)
 
-        embed.set_footer(text=f"来自暗影与月光下的祝福 | {bot.user.name}")
+        embed.set_footer(text=random.choice(footers))
         
         await interaction.response.send_message(embed=embed)
     except Exception as e:
