@@ -380,9 +380,8 @@ async def register_updown_channel_error(interaction: discord.Interaction, error:
 
 # --- Modal for user input ---
 class UpDownInputModal(discord.ui.Modal, title="楼上楼下"):
-    def __init__(self, last_message: str, *, target_channel_id: int):
+    def __init__(self, last_message: str):
         super().__init__()
-        self.target_channel_id = target_channel_id
         self.add_item(discord.ui.TextInput(
             label="楼上的内容",
             style=discord.TextStyle.short,
@@ -400,12 +399,7 @@ class UpDownInputModal(discord.ui.Modal, title="楼上楼下"):
         self.add_item(self.response)
 
     async def on_submit(self, interaction: discord.Interaction):
-        target_channel = bot.get_channel(self.target_channel_id)
-        if not target_channel:
-            await interaction.response.send_message("❌ 目标频道未找到或机器人无法访问。", ephemeral=True)
-            return
-
-        channel_id_str = str(self.target_channel_id)
+        channel_id_str = str(interaction.channel_id)
         channel_data = bot.updown_data['channels'][channel_id_str]
         
         user_input = self.response.value
@@ -418,8 +412,8 @@ class UpDownInputModal(discord.ui.Modal, title="楼上楼下"):
             
         bot.save_data(bot.updown_file, bot.updown_data)
 
-        # 匿名发送消息到目标频道
-        await target_channel.send(f"> {user_input}")
+        # 匿名发送消息
+        await interaction.channel.send(f"> {user_input}")
         await interaction.response.send_message("✅ 你的匿名回答已发送！", ephemeral=True)
 
     async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
@@ -428,17 +422,17 @@ class UpDownInputModal(discord.ui.Modal, title="楼上楼下"):
 
 # --- View with the button ---
 class UpDownView(discord.ui.View):
-    def __init__(self, *, target_channel_id: int):
-        super().__init__(timeout=180)
-        self.target_channel_id = target_channel_id
+    def __init__(self):
+        super().__init__(timeout=300) # 按钮在5分钟后失效
 
-    @discord.ui.button(label="参与楼上楼下", style=discord.ButtonStyle.primary, custom_id="updown_play_button")
+    @discord.ui.button(label="参与楼上楼下", style=discord.ButtonStyle.primary)
     async def play_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         try:
-            channel_id_str = str(self.target_channel_id)
+            channel_id_str = str(interaction.channel_id)
             
+            # 再次检查，以防万一频道被取消注册
             if channel_id_str not in bot.updown_data['channels']:
-                await interaction.response.send_message("❌ 目标频道已不再是游戏频道。", ephemeral=True)
+                await interaction.response.send_message("❌ 此频道不再是游戏频道。", ephemeral=True)
                 return
 
             channel_data = bot.updown_data['channels'][channel_id_str]
@@ -454,7 +448,7 @@ class UpDownView(discord.ui.View):
                 else: # 如果循环正常结束（所有消息都是“同上”）
                     last_message = "你是第一个！(之前都是同上)"
 
-            modal = UpDownInputModal(last_message=last_message, target_channel_id=self.target_channel_id)
+            modal = UpDownInputModal(last_message=last_message)
             await interaction.response.send_modal(modal)
         except Exception as e:
             logger.error(f"Error in UpDownView play_button: {e}")
@@ -462,26 +456,25 @@ class UpDownView(discord.ui.View):
                 try:
                     await interaction.response.send_message("❌ 处理点击时发生内部错误，请联系管理员查看日志。", ephemeral=True)
                 except discord.errors.InteractionResponded:
-                    pass # Already responded to, nothing to do
+                    pass
                 except Exception as e_inner:
                     logger.error(f"Failed to send error message for play_button: {e_inner}")
 
-@updown_group.command(name="玩", description="发起或参与楼上楼下游戏")
-@app_commands.describe(channel="请选择要发送匿名消息的游戏频道")
-async def play_updown(interaction: discord.Interaction, channel: discord.TextChannel):
-    channel_id_str = str(channel.id)
+@updown_group.command(name="玩", description="发起一个临时的楼上楼下游戏参与按钮")
+async def play_updown(interaction: discord.Interaction):
+    channel_id_str = str(interaction.channel_id)
     if channel_id_str not in bot.updown_data['channels']:
-        await interaction.response.send_message(f"❌ **{channel.name}** 不是一个楼上楼下游戏频道。请让管理员先注册它。", ephemeral=True)
+        await interaction.response.send_message("❌ 此功能只能在已注册的楼上楼下游戏频道中使用。", ephemeral=True)
         return
 
     embed = discord.Embed(
         title="⬇️ 楼上楼下游戏 ⬆️",
-        description=f"点击下面的按钮，匿名回答楼上的问题或延续话题！\n匿名消息将被发送到 **#{channel.name}** 频道。",
+        description="点击下面的按钮，匿名回答楼上的问题或延续话题！\n\n*这是一个只有你能看到的临时消息，按钮将在5分钟后失效。*",
         color=discord.Color.blurple()
     )
     embed.set_footer(text="保持友善，玩得开心！")
 
-    view = UpDownView(target_channel_id=channel.id)
+    view = UpDownView()
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
 # --- Flask 路由 ---
