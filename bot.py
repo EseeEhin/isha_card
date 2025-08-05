@@ -58,7 +58,6 @@ class TarotBot(commands.Bot):
             self.updown_data = {'channels': {}}
 
     async def setup_hook(self):
-        self.add_view(UpDownView())
         try:
             guild_ids_str = os.getenv("DISCORD_GUILD_ID")
             if guild_ids_str:
@@ -381,8 +380,9 @@ async def register_updown_channel_error(interaction: discord.Interaction, error:
 
 # --- Modal for user input ---
 class UpDownInputModal(discord.ui.Modal, title="楼上楼下"):
-    def __init__(self, last_message: str):
+    def __init__(self, last_message: str, *, target_channel_id: int):
         super().__init__()
+        self.target_channel_id = target_channel_id
         self.add_item(discord.ui.TextInput(
             label="楼上的内容",
             style=discord.TextStyle.short,
@@ -400,7 +400,12 @@ class UpDownInputModal(discord.ui.Modal, title="楼上楼下"):
         self.add_item(self.response)
 
     async def on_submit(self, interaction: discord.Interaction):
-        channel_id_str = str(interaction.channel_id)
+        target_channel = bot.get_channel(self.target_channel_id)
+        if not target_channel:
+            await interaction.response.send_message("❌ 目标频道未找到或机器人无法访问。", ephemeral=True)
+            return
+
+        channel_id_str = str(self.target_channel_id)
         channel_data = bot.updown_data['channels'][channel_id_str]
         
         user_input = self.response.value
@@ -413,8 +418,8 @@ class UpDownInputModal(discord.ui.Modal, title="楼上楼下"):
             
         bot.save_data(bot.updown_file, bot.updown_data)
 
-        # 匿名发送消息
-        await interaction.channel.send(f"> {user_input}")
+        # 匿名发送消息到目标频道
+        await target_channel.send(f"> {user_input}")
         await interaction.response.send_message("✅ 你的匿名回答已发送！", ephemeral=True)
 
     async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
@@ -423,49 +428,61 @@ class UpDownInputModal(discord.ui.Modal, title="楼上楼下"):
 
 # --- View with the button ---
 class UpDownView(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None) # 持久化视图
+    def __init__(self, *, target_channel_id: int):
+        super().__init__(timeout=180)
+        self.target_channel_id = target_channel_id
 
     @discord.ui.button(label="参与楼上楼下", style=discord.ButtonStyle.primary, custom_id="updown_play_button")
     async def play_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        channel_id_str = str(interaction.channel_id)
-        
-        if channel_id_str not in bot.updown_data['channels']:
-            await interaction.response.send_message("❌ 此频道未开启楼上楼下游戏。", ephemeral=True)
-            return
+        try:
+            channel_id_str = str(self.target_channel_id)
+            
+            if channel_id_str not in bot.updown_data['channels']:
+                await interaction.response.send_message("❌ 目标频道已不再是游戏频道。", ephemeral=True)
+                return
 
-        channel_data = bot.updown_data['channels'][channel_id_str]
-        history = channel_data.get("message_history", [])
-        
-        last_message = "你是第一个！"
-        if history:
-            # 向上查找直到找到非“同上”的消息
-            for msg in reversed(history):
-                if msg.strip() not in ("同上", "same", "+1"):
-                    last_message = msg
-                    break
-            else: # 如果循环正常结束（所有消息都是“同上”）
-                last_message = "你是第一个！(之前都是同上)"
+            channel_data = bot.updown_data['channels'][channel_id_str]
+            history = channel_data.get("message_history", [])
+            
+            last_message = "你是第一个！"
+            if history:
+                # 向上查找直到找到非“同上”的消息
+                for msg in reversed(history):
+                    if msg.strip() not in ("同上", "same", "+1"):
+                        last_message = msg
+                        break
+                else: # 如果循环正常结束（所有消息都是“同上”）
+                    last_message = "你是第一个！(之前都是同上)"
 
-        modal = UpDownInputModal(last_message=last_message)
-        await interaction.response.send_modal(modal)
+            modal = UpDownInputModal(last_message=last_message, target_channel_id=self.target_channel_id)
+            await interaction.response.send_modal(modal)
+        except Exception as e:
+            logger.error(f"Error in UpDownView play_button: {e}")
+            if not interaction.response.is_done():
+                try:
+                    await interaction.response.send_message("❌ 处理点击时发生内部错误，请联系管理员查看日志。", ephemeral=True)
+                except discord.errors.InteractionResponded:
+                    pass # Already responded to, nothing to do
+                except Exception as e_inner:
+                    logger.error(f"Failed to send error message for play_button: {e_inner}")
 
 @updown_group.command(name="玩", description="发起或参与楼上楼下游戏")
-async def play_updown(interaction: discord.Interaction):
-    channel_id_str = str(interaction.channel_id)
+@app_commands.describe(channel="请选择要发送匿名消息的游戏频道")
+async def play_updown(interaction: discord.Interaction, channel: discord.TextChannel):
+    channel_id_str = str(channel.id)
     if channel_id_str not in bot.updown_data['channels']:
-        await interaction.response.send_message("❌ 此频道未注册为楼上楼下游戏频道。请让管理员使用 `/楼上楼下 注册` 指令。", ephemeral=True)
+        await interaction.response.send_message(f"❌ **{channel.name}** 不是一个楼上楼下游戏频道。请让管理员先注册它。", ephemeral=True)
         return
 
     embed = discord.Embed(
         title="⬇️ 楼上楼下游戏 ⬆️",
-        description="点击下面的按钮，匿名回答楼上的问题或延续话题！\n\n**规则:**\n1. 点击按钮查看楼上的内容。\n2. 在弹出的窗口中输入你的回答。\n3. 你的回答将被匿名发送到此频道。\n4. 如果你想表达同样的意思，可以说“同上”。",
+        description=f"点击下面的按钮，匿名回答楼上的问题或延续话题！\n匿名消息将被发送到 **#{channel.name}** 频道。",
         color=discord.Color.blurple()
     )
     embed.set_footer(text="保持友善，玩得开心！")
 
-    view = UpDownView()
-    await interaction.response.send_message(embed=embed, view=view)
+    view = UpDownView(target_channel_id=channel.id)
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
 # --- Flask 路由 ---
 bot.tree.add_command(updown_group)
