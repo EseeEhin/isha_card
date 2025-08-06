@@ -4,5 +4,3 @@ python-dotenv
 Pillow
 requests
 waitress
-sentence-transformers
-torch
