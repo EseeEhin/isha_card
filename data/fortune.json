@@ -1,211 +1,87 @@
 {
-  "tag_pools": {
+  "levels": [
+    { "id": 1, "level_name": "大吉", "stars": 7, "star_shape": "heart", "image": "https://i2.hdslb.com/bfs/article/4602128a3a38f9f21132a84bcfcd452da49a85fb.jpg@1192w.avif", "good_events": 4, "bad_events": 1 },
+    { "id": 2, "level_name": "中吉", "stars": 6, "star_shape": "heart", "image": "https://i2.hdslb.com/bfs/article/a63ed6caa464041a3c149a5956c237aadcf9bed0.jpg@1192w.avif", "good_events": 3, "bad_events": 1 },
+    { "id": 3, "level_name": "吉", "stars": 5, "star_shape": "star", "image": "https://i2.hdslb.com/bfs/article/66215214adb3aa0c43d6da6d74ab119badaa3859.jpg@1192w.avif", "good_events": 3, "bad_events": 2 },
+    { "id": 4, "level_name": "小吉", "stars": 4, "star_shape": "star", "image": "https://i2.hdslb.com/bfs/article/94a3f2ac6073d1abf43358bf836c74bebb3dd384.png@1192w.avif", "good_events": 2, "bad_events": 2 },
+    { "id": 5, "level_name": "末吉", "stars": 3, "star_shape": "thorn", "image": "https://i2.hdslb.com/bfs/article/ea6604f3b9b1de99369ca10c222b9260c4b96f96.jpg@1192w.avif", "good_events": 2, "bad_events": 3 },
+    { "id": 6, "level_name": "小厄", "stars": 2, "star_shape": "thorn", "image": "https://i2.hdslb.com/bfs/article/0e7c22ef1179bf969916b1e210454a79c0f7d374.jpg@1192w.avif", "good_events": 1, "bad_events": 3 },
+    { "id": 7, "level_name": "大厄", "stars": 1, "star_shape": "skull", "image": "https://i2.hdslb.com/bfs/article/09bdc8409569b21e3c23ac974c6095e6a2fe28ec.jpg@1192w.avif", "good_events": 1, "bad_events": 4 }
+  ],
+  "activities": {
     "good": [
-      {
-        "id": 1,
-        "tag": "天降横财",
-        "text": "财运亨通，有意外之喜，可能是奖金、红包或意想不到的收入。"
-      },
-      {
-        "id": 2,
-        "tag": "桃花临门",
-        "text": "魅力四射，一场浪漫的邂逅或美好的约会正在前方等你。"
-      },
-      {
-        "id": 3,
-        "tag": "事业高升",
-        "text": "工作中的努力将获得认可，有晋升或接到重要项目的机会。"
-      },
-      {
-        "id": 4,
-        "tag": "贵人相助",
-        "text": "在关键时刻将有人伸出援手，助你一臂之力，轻松渡过难关。"
-      },
-      {
-        "id": 5,
-        "tag": "灵感如泉",
-        "text": "创造力爆棚，思维如泉涌，无论是工作还是创作都有新突破。"
-      },
-      {
-        "id": 6,
-        "tag": "心想事成",
-        "text": "你心中期盼已久的事情，今天将如愿以偿，顺利实现。"
-      },
-      {
-        "id": 7,
-        "tag": "学业精进",
-        "text": "学习效率极高，考试顺利，知识如海绵般被吸收。"
-      },
-      {
-        "id": 8,
-        "tag": "活力四射",
-        "text": "精力充沛，神采奕奕，无论做什么都感觉充满力量。"
-      },
-      {
-        "id": 9,
-        "tag": "人际和谐",
-        "text": "与朋友、家人、同事的交往非常融洽，充满欢声笑语。"
-      },
-      {
-        "id": 10,
-        "tag": "一帆风顺",
-        "text": "今天的计划将顺利推进，万事顺意，没有阻碍。"
-      }
+      { "name": "投资理财", "description": "今日财星高照，是进行投资的好时机。" },
+      { "name": "签订合同", "description": "今天适合签约，有望达成双赢的协议。" },
+      { "name": "结交新友", "description": "主动与人交往，可能会认识志同道合的新朋友。" },
+      { "name": "表白示爱", "description": "鼓起勇气表达爱意，成功率会很高哦。" },
+      { "name": "学习新知", "description": "求知欲旺盛，学习新技能或知识会事半功倍。" },
+      { "name": "开启项目", "description": "适合启动新计划或项目，会有一个好的开始。" },
+      { "name": "运动健身", "description": "活力满满，进行体育锻炼能让你身心舒畅。" },
+      { "name": "家庭聚会", "description": "与家人共度时光，能感受到家庭的温暖。" },
+      { "name": "规划旅行", "description": "制定旅行计划，会让未来的旅途充满期待。" },
+      { "name": "购物消费", "description": "可能会买到物超所值的好东西。" }
     ],
     "bad": [
-      {
-        "id": 1,
-        "tag": "小人作祟",
-        "text": "警惕身边不和谐的声音，可能会有人在背后给你制造麻烦。"
-      },
-      {
-        "id": 2,
-        "tag": "意外破财",
-        "text": "可能会有突如其来的支出，看管好你的钱包，避免不必要的消费。"
-      },
-      {
-        "id": 3,
-        "tag": "诸事不顺",
-        "text": "今天做事可能磕磕绊绊，阻碍重重，需要更多耐心。"
-      },
-      {
-        "id": 4,
-        "tag": "厄运缠身",
-        "text": "感觉运气不佳，最好低调行事，避免做出重大决定。"
-      },
-      {
-        "id": 5,
-        "tag": "心烦意乱",
-        "text": "内心焦躁不安，思绪混乱，不妨静下心来，听听音乐。"
-      },
-      {
-        "id": 6,
-        "tag": "无妄之灾",
-        "text": "可能会被卷入与你无关的麻烦中，尽量远离是非之地。"
-      },
-      {
-        "id": 7,
-        "tag": "口舌之争",
-        "text": "与人沟通时容易产生误会和争执，说话前请三思。"
-      },
-      {
-        "id": 8,
-        "tag": "身心俱疲",
-        "text": "感到莫名的疲惫和乏力，注意休息，别太劳累。"
-      },
-      {
-        "id": 9,
-        "tag": "计划突变",
-        "text": "原定的计划可能被意外打乱，需要灵活应对，随时调整。"
-      },
-      {
-        "id": 10,
-        "tag": "灵感枯竭",
-        "text": "思维陷入僵局，缺乏新的想法，不妨暂时放下工作，放松一下大脑。"
-      }
-    ],
-    "neutral": [
-      {
-        "id": 1,
-        "tag": "平淡是福",
-        "text": "没有大风大浪，今天会是平静祥和的一天，享受这份安宁。"
-      },
-      {
-        "id": 2,
-        "tag": "关注健康",
-        "text": "身体是革命的本钱，记得多喝水，适当运动。"
-      },
-      {
-        "id": 3,
-        "tag": "宜室宜家",
-        "text": "适合待在家里，享受宁静的个人时光或温馨的家庭生活。"
-      },
-      {
-        "id": 4,
-        "tag": "静心思考",
-        "text": "适合一个人静静地规划未来或反思过往，整理思绪。"
-      },
-      {
-        "id": 5,
-        "tag": "出门散心",
-        "text": "可以出门走走，呼吸新鲜空气，感受自然的美好。"
-      },
-      {
-        "id": 6,
-        "tag": "保持耐心",
-        "text": "今天宜静不宜动，对人对事多一点耐心，事情会更顺利。"
-      },
-      {
-        "id": 7,
-        "tag": "按部就班",
-        "text": "按照既定计划行事，稳扎稳打，就能安稳度过一天。"
-      },
-      {
-        "id": 8,
-        "tag": "顺其自然",
-        "text": "不必强求，万事顺其自然发展，反而会有意想不到的结果。"
-      },
-      {
-        "id": 9,
-        "tag": "整理环境",
-        "text": "整理一下房间或办公桌，清爽的环境能带来好心情。"
-      },
-      {
-        "id": 10,
-        "tag": "保持现状",
-        "text": "维持当前的状态就好，不宜有大的变动或新的尝试。"
-      }
+      { "name": "重大决策", "description": "思绪不清，不宜做重要的决定，以免后悔。" },
+      { "name": "借贷担保", "description": "避免与人发生金钱往来，容易产生纠纷。" },
+      { "name": "口舌之争", "description": "言多必失，今天最好少说多做，避免争吵。" },
+      { "name": "远行出差", "description": "旅途可能不太顺利，建议推迟出行计划。" },
+      { "name": "动土施工", "description": "不宜进行房屋装修或动土，以免发生意外。" },
+      { "name": "探视病人", "description": "自身磁场较弱，不适合去医院等阴气较重的地方。" },
+      { "name": "高风险投资", "description": "市场波动大，进行高风险投资容易亏损。" },
+      { "name": "熬夜加班", "description": "身体容易感到疲劳，应注意休息，避免过度劳累。" },
+      { "name": "处理旧物", "description": "整理旧物可能会引发不好的回忆，影响心情。" },
+      { "name": "单独行动", "description": "今天最好与人结伴而行，避免独自在偏僻处逗留。" }
     ]
   },
-  "levels": [
+  "domains": [
     {
-      "id": 1,
-      "level_name": "大吉",
-      "stars": 7,
-      "star_shape": "heart",
-      "image": "https://i2.hdslb.com/bfs/article/4602128a3a38f9f21132a84bcfcd452da49a85fb.jpg@1192w.avif"
+      "name": "财运",
+      "fortunes": {
+        "大吉": "财运亨通，收入丰厚，偏财运也极佳，可能有意外之财。",
+        "中吉": "财运不错，正财稳定，小有盈余，适合进行一些小额投资。",
+        "吉": "财运平稳，收支平衡，理性消费能让你的财务状况保持良好。",
+        "小吉": "财运尚可，但需留意不必要的开支，做好预算。",
+        "末吉": "财运平平，无大的进账，需谨慎理财，避免冲动消费。",
+        "小厄": "有破财风险，注意保管好个人财物，避免不必要的支出。",
+        "大厄": "财运低迷，可能会有意外的经济损失，投资需格外谨慎。"
+      }
     },
     {
-      "id": 2,
-      "level_name": "中吉",
-      "stars": 6,
-      "star_shape": "heart",
-      "image": "https://i2.hdslb.com/bfs/article/a63ed6caa464041a3c149a5956c237aadcf9bed0.jpg@1192w.avif"
+      "name": "事业",
+      "fortunes": {
+        "大吉": "事业运极旺，工作表现突出，易得领导赏识，有晋升机会。",
+        "中吉": "工作顺利，团队合作愉快，能够高效完成任务。",
+        "吉": "按部就班，稳步推进，虽然没有大突破，但能平稳度过。",
+        "小吉": "可能会遇到一些小挑战，但凭你的能力可以轻松解决。",
+        "末吉": "工作状态一般，容易分心，需要集中注意力才能完成任务。",
+        "小厄": "工作上可能出现失误，需仔细核对，避免被人抓住把柄。",
+        "大厄": "事业上阻力重重，可能会遇到难以解决的困难，需保持耐心。"
+      }
     },
     {
-      "id": 3,
-      "level_name": "吉",
-      "stars": 5,
-      "star_shape": "star",
-      "image": "https://i2.hdslb.com/bfs/article/66215214adb3aa0c43d6da6d74ab119badaa3859.jpg@1192w.avif"
+      "name": "感情",
+      "fortunes": {
+        "大吉": "桃花运爆棚，单身者有望邂逅良缘，有伴者感情甜蜜。",
+        "中吉": "人缘佳，与伴侣相处融洽，沟通顺畅。",
+        "吉": "感情生活平淡而温馨，享受这份宁静的美好。",
+        "小吉": "可能会有小的误会，及时沟通就能化解。",
+        "末吉": "感情需求不高，更享受独处的时光。",
+        "小厄": "容易因小事与伴侣争吵，需控制情绪，多些包容。",
+        "大厄": "感情上可能出现危机，需冷静处理，避免做出冲动的决定。"
+      }
     },
     {
-      "id": 4,
-      "level_name": "小吉",
-      "stars": 4,
-      "star_shape": "star",
-      "image": "https://i2.hdslb.com/bfs/article/94a3f2ac6073d1abf43358bf836c74bebb3dd384.png@1192w.avif"
-    },
-    {
-      "id": 5,
-      "level_name": "末吉",
-      "stars": 3,
-      "star_shape": "thorn",
-      "image": "https://i2.hdslb.com/bfs/article/ea6604f3b9b1de99369ca10c222b9260c4b96f96.jpg@1192w.avif"
-    },
-    {
-      "id": 6,
-      "level_name": "小厄",
-      "stars": 2,
-      "star_shape": "thorn",
-      "image": "https://i2.hdslb.com/bfs/article/0e7c22ef1179bf969916b1e210454a79c0f7d374.jpg@1192w.avif"
-    },
-    {
-      "id": 7,
-      "level_name": "大厄",
-      "stars": 1,
-      "star_shape": "skull",
-      "image": "https://i2.hdslb.com/bfs/article/09bdc8409569b21e3c23ac974c6095e6a2fe28ec.jpg@1192w.avif"
+      "name": "健康",
+      "fortunes": {
+        "大吉": "精力充沛，身心状态俱佳，充满活力。",
+        "中吉": "身体状况良好，适合进行一些户外活动。",
+        "吉": "健康状况稳定，注意保持良好的作息习惯。",
+        "小吉": "注意饮食，可能会有小的肠胃不适。",
+        "末吉": "容易感到疲劳，需要多休息，补充睡眠。",
+        "小厄": "身体免疫力下降，容易生病，需注意保暖。",
+        "大厄": "健康运不佳，需特别关注身体状况，如有不适及时就医。"
+      }
     }
   ],
   "connectors": {

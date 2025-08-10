@@ -15,63 +15,39 @@ class FortuneCog(commands.Cog):
     async def fortune(self, interaction: discord.Interaction):
         try:
             fortune_data = load_json_data(self.fortune_file)
-            if not all(k in fortune_data for k in ["levels", "tag_pools", "connectors"]):
+            if not all(k in fortune_data for k in ["levels", "activities", "domains", "connectors"]):
                 await interaction.response.send_message("抱歉，运势数据结构不正确，请检查 `fortune.json`。")
                 return
 
+            # 1. 抽取运势等级
             chosen_level = random.choice(fortune_data["levels"])
+            level_name = chosen_level["level_name"]
             stars = chosen_level.get("stars", 3)
 
-            tag_pools = fortune_data.get("tag_pools", {})
-            good_pool = tag_pools.get("good", [])
-            bad_pool = tag_pools.get("bad", [])
-            neutral_pool = tag_pools.get("neutral", [])
-            
+            # 2. 生成宜忌列表
+            activities = fortune_data.get("activities", {})
+            good_activities_pool = activities.get("good", [])
+            bad_activities_pool = activities.get("bad", [])
+
+            num_good = chosen_level.get("good_events", 2)
+            num_bad = chosen_level.get("bad_events", 2)
+
+            good_events = random.sample(good_activities_pool, min(num_good, len(good_activities_pool)))
+            bad_events = random.sample(bad_activities_pool, min(num_bad, len(bad_activities_pool)))
+
+            # 3. 生成领域解读
+            domain_fortunes = []
+            for domain in fortune_data.get("domains", []):
+                domain_name = domain.get("name")
+                fortune_text = domain.get("fortunes", {}).get(level_name)
+                if domain_name and fortune_text:
+                    domain_fortunes.append(f"**{domain_name}**: {fortune_text}")
+
+            # 4. 组装 Embed 消息
             luck_type = "neutral"
             if stars >= 5: luck_type = "good"
             elif stars <= 2: luck_type = "bad"
-
-            selected_tag_objects = []
-            total_tags = random.randint(1, 5)
-
-            base_pool = []
-            if luck_type == "good":
-                base_pool = good_pool
-            elif luck_type == "bad":
-                base_pool = bad_pool
-            else:
-                base_pool = neutral_pool
             
-            if base_pool:
-                selected_tag_objects.append(random.choice(base_pool))
-
-            num_additional_tags = total_tags - len(selected_tag_objects)
-            if num_additional_tags > 0 and neutral_pool:
-                existing_ids = {t['id'] for t in selected_tag_objects}
-                drawable_neutral_pool = [t for t in neutral_pool if t['id'] not in existing_ids]
-                
-                num_to_draw = min(num_additional_tags, len(drawable_neutral_pool))
-
-                if num_to_draw > 0:
-                    additional_tags = random.sample(drawable_neutral_pool, k=num_to_draw)
-                    selected_tag_objects.extend(additional_tags)
-
-            tags_to_display = [obj['tag'] for obj in selected_tag_objects]
-            text_fragments = [obj['text'] for obj in selected_tag_objects]
-            
-            connectors = fortune_data.get("connectors", {})
-            
-            intro_options = connectors.get("intro", [""])
-            intro = random.choice(intro_options) if intro_options else ""
-
-            outro_options = connectors.get(f"outro_{luck_type}", [""])
-            outro = random.choice(outro_options) if outro_options else ""
-            
-            final_text = intro + " " + "".join(text_fragments).strip().rstrip('，').rstrip('。').rstrip(',') + "。"
-            if outro:
-                final_text += " " + outro
-
-            level_name = chosen_level["level_name"]
             color = discord.Color.light_grey()
             if luck_type == "good": color = discord.Color.gold()
             elif luck_type == "bad": color = discord.Color.dark_purple()
@@ -80,37 +56,31 @@ class FortuneCog(commands.Cog):
             star_symbol = star_icons.get(chosen_level.get("star_shape", "star"), '✨')
             stars_display = star_symbol * stars + '🖤' * (7 - stars)
 
-            titles = [
-                "血族猫娘的今日占卜",
-                "来自暗影与月光下的祝福",
-                "今日运势指引",
-                "喵~ 你的今日份好运！"
-            ]
-            descriptions = [
-                f"喵~ {interaction.user.mention}，来看看你的今日运势吧！",
-                f"你好呀，{interaction.user.mention}！这是给你的今日占卜。",
-                f"{interaction.user.mention}，月光为你洒下今天的启示。",
-                f"嗨，{interaction.user.mention}，看看今天有什么在等着你？"
-            ]
-            footers = [
-                f"来自暗影与月光下的祝福 | {self.bot.user.name}",
-                f"由 {self.bot.user.name} 为你占卜",
-                "愿星光指引你的道路",
-                "血族猫娘的神秘低语"
-            ]
-
             embed = discord.Embed(
-                title=random.choice(titles),
-                description=random.choice(descriptions),
+                title=f"今日运势 - {level_name}",
+                description=f"喵~ {interaction.user.mention}，这是你今天的运势指引！",
                 color=color
             )
-            embed.add_field(name="今日运势", value=f"**{level_name}**", inline=False)
-            embed.add_field(name="幸运星", value=stars_display, inline=False)
-            if tags_to_display:
-                tags_display_str = " | ".join([f"`{tag}`" for tag in tags_to_display])
-                embed.add_field(name="运势标签", value=tags_display_str, inline=False)
-            embed.add_field(name="血族猫娘的低语", value=final_text, inline=False)
-            embed.set_footer(text=random.choice(footers))
+            
+            embed.add_field(name="幸运等级", value=f"**{level_name}**", inline=True)
+            embed.add_field(name="幸运星", value=stars_display, inline=True)
+
+            if good_events:
+                good_events_text = "\n".join([f"**{e['name']}**: {e['description']}" for e in good_events])
+                embed.add_field(name="今日宜", value=good_events_text, inline=False)
+
+            if bad_events:
+                bad_events_text = "\n".join([f"**{e['name']}**: {e['description']}" for e in bad_events])
+                embed.add_field(name="今日忌", value=bad_events_text, inline=False)
+
+            if domain_fortunes:
+                embed.add_field(name="各领域运势", value="\n".join(domain_fortunes), inline=False)
+
+            # 添加结尾祝福语
+            connectors = fortune_data.get("connectors", {})
+            outro_options = connectors.get(f"outro_{luck_type}", [""])
+            outro = random.choice(outro_options) if outro_options else ""
+            embed.set_footer(text=outro)
 
             image_url = chosen_level.get("image")
             if image_url:
@@ -156,8 +126,8 @@ class FortuneCog(commands.Cog):
     async def fortune_level_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[int]]:
         fortune_data = load_json_data(self.fortune_file)
         choices = [
-            app_commands.Choice(name=f"({level['stars']}★) {level['level_name']}", value=level['id'])
-            for level in fortune_data.get('levels', []) if current.lower() in level['level_name'].lower()
+            app_commands.Choice(name=f"({level.get('stars', 'N/A')}★) {level['level_name']}", value=level['id'])
+            for level in fortune_data.get('levels', []) if current.lower() in level.get('level_name', '').lower()
         ]
         return choices[:25]
 

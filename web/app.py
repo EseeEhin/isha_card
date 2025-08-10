@@ -62,41 +62,49 @@ def register_routes(bot):
             if request.method == 'POST':
                 form_type = request.form.get('form_type')
 
-                if form_type == 'connectors':
-                    fortune_data['connectors']['intro'] = request.form.get('intro')
-                    fortune_data['connectors']['outro_good'] = request.form.get('outro_good')
-                    fortune_data['connectors']['outro_neutral'] = request.form.get('outro_neutral')
-                    fortune_data['connectors']['outro_bad'] = request.form.get('outro_bad')
-
-                elif form_type == 'edit_pool':
-                    pool_name = request.form.get('pool_name')
-                    if pool_name in fortune_data['tag_pools']:
-                        if 'delete_tag' in request.form:
-                            tag_id_to_delete = int(request.form.get('delete_tag'))
-                            fortune_data['tag_pools'][pool_name] = [t for t in fortune_data['tag_pools'][pool_name] if t['id'] != tag_id_to_delete]
-                        else:
-                            for item in fortune_data['tag_pools'][pool_name]:
-                                item_id = item['id']
-                                item['tag'] = request.form.get(f'tag_{item_id}', item['tag'])
-                                item['text'] = request.form.get(f'text_{item_id}', item['text'])
-                
-                elif form_type == 'add_to_pool':
-                    pool_name = request.form.get('pool_name')
-                    if pool_name in fortune_data['tag_pools']:
-                        new_tag = request.form.get('new_tag')
-                        new_text = request.form.get('new_text')
-                        if new_tag and new_text:
-                            pool = fortune_data['tag_pools'][pool_name]
-                            max_id = max(t['id'] for t in pool) if pool else 0
-                            pool.append({'id': max_id + 1, 'tag': new_tag, 'text': new_text})
-
-                elif form_type == 'levels':
+                if form_type == 'levels':
                     for level in fortune_data['levels']:
                         level_id = level['id']
                         level['level_name'] = request.form.get(f'level_name_{level_id}', level['level_name'])
                         level['stars'] = int(request.form.get(f'stars_{level_id}', level['stars']))
                         level['star_shape'] = request.form.get(f'star_shape_{level_id}', level['star_shape'])
                         level['image'] = request.form.get(f'image_{level_id}', '')
+                        level['good_events'] = int(request.form.get(f'good_events_{level_id}', 2))
+                        level['bad_events'] = int(request.form.get(f'bad_events_{level_id}', 2))
+
+                elif form_type == 'activities':
+                    pool_name = request.form.get('pool_name')
+                    if pool_name in fortune_data['activities']:
+                        # Handle deletion
+                        if 'delete_activity' in request.form:
+                            activity_name_to_delete = request.form.get('delete_activity')
+                            fortune_data['activities'][pool_name] = [a for a in fortune_data['activities'][pool_name] if a['name'] != activity_name_to_delete]
+                        # Handle addition
+                        elif 'new_name' in request.form and 'new_description' in request.form:
+                            new_name = request.form.get('new_name')
+                            new_description = request.form.get('new_description')
+                            if new_name and new_description:
+                                fortune_data['activities'][pool_name].append({'name': new_name, 'description': new_description})
+                        # Handle updates
+                        else:
+                            for i, activity in enumerate(fortune_data['activities'][pool_name]):
+                                original_name = request.form.get(f'original_name_{i}')
+                                activity['name'] = request.form.get(f'name_{i}', original_name)
+                                activity['description'] = request.form.get(f'description_{i}', activity['description'])
+
+                elif form_type == 'domains':
+                    for domain in fortune_data['domains']:
+                        domain_name = domain['name']
+                        for level in fortune_data['levels']:
+                            level_name = level['level_name']
+                            key = f"domain_{domain_name}_{level_name}"
+                            domain['fortunes'][level_name] = request.form.get(key, domain['fortunes'].get(level_name, ''))
+                
+                elif form_type == 'connectors':
+                    fortune_data['connectors']['intro'] = request.form.get('intro', '').split(',')
+                    fortune_data['connectors']['outro_good'] = request.form.get('outro_good', '').split(',')
+                    fortune_data['connectors']['outro_neutral'] = request.form.get('outro_neutral', '').split(',')
+                    fortune_data['connectors']['outro_bad'] = request.form.get('outro_bad', '').split(',')
 
                 save_json_data(fortune_file, fortune_data)
                 return redirect(url_for('fortune_web'))
