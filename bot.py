@@ -67,7 +67,9 @@ def run_flask(bot):
         logger.info("在端口 7860 上启动 Flask 服务器")
         # 使用 waitress 或 gunicorn 等生产服务器会更好
         from waitress import serve
-        serve(flask_app, host='0.0.0.0', port=7860)
+        port = int(os.getenv('FLASK_PORT', 7860))
+        logger.info(f"在端口 {port} 上启动 Flask 服务器")
+        serve(flask_app, host='0.0.0.0', port=port)
     except Exception as e:
         logger.error(f"启动 Flask 时出错: {e}")
 
